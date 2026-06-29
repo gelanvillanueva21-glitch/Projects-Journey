@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset = "UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>To Do List</title>
+        <link rel = "stylesheet" href = "../Css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        
+        <div class="window-box-sign-in">
+            <div id="modal-overlay" class="modal-overlay">
+                <div id="sign-in-box" class="modern-auth-box">
+                    <h2>Sign Up</h2>
+                    <p class="subtitle">Create an account to save your to-do items securely.</p>
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" placeholder="Enter your username">
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="••••••••">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="show-password-checkbox">
+                        <label for="show-password-checkbox">Show password</label>
+                    </div>
+                        <button id="log-in">Confirm</button>
+                    <div class="auth-footer">
+                        <span>Don't have one? <a href="#">Create account</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class = "container">
+            <div class="to-do-list-box">
+
+            </div>
+        </div>
+
+        <script src = "../Js/app.js"></script>
+    </body>
+</html>
