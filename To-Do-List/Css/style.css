@@ -169,7 +169,7 @@ body {
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
     margin-top: 0.8rem;
 }
 
@@ -177,7 +177,6 @@ body {
 #log-in:hover {
     background-color: var(--color-indigo-dark);
 }
-
 
 
 .auth-footer {
