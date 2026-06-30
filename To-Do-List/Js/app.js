@@ -8,6 +8,8 @@ const addButton = document.getElementById('add-btn');
 const addInputList = document.getElementById('to-do-list-title');
 const toDoList = document.querySelector('.list-box ul');
 const notiWindow = document.querySelector('.popup-notification');
+const alreadyExistWindow = document.querySelector('.duplicate-popup');
+const closeBtn = document.querySelector('.duplicate-close');
 
 
 // SHOW PASSWORD LAYER
@@ -33,6 +35,7 @@ addButton.addEventListener('click', () => {
         allList.forEach((list) => {
             if (list.innerText === addInputList.value) {
                 isAlreadyExist = true
+                alreadyExistWindow.style.display = 'block';
                 return
             }
         })
@@ -59,4 +62,14 @@ window.addEventListener('click', (e) => {
         notiWindow.style.display = 'none';
     }
 
+    if (event.target.classList.contains('duplicate-popup')) {
+        alreadyExistWindow.style.display = 'none';
+    }
+
 })
+
+closeBtn.addEventListener('click', () => {
+
+    alreadyExistWindow.style.display = 'none';
+
+});

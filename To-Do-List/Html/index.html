@@ -10,36 +10,79 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     </head>
     <body>
+        <div class="container">
         
-        <div class="window-box-sign-in">
-            <div id="modal-overlay" class="modal-overlay">
-                <div id="sign-in-box" class="modern-auth-box">
-                    <h2>Sign Up</h2>
-                    <p class="subtitle">Create an account to save your to-do items securely.</p>
-                    <div class="input-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" placeholder="Enter your username">
-                    </div>
-                    <div class="input-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" placeholder="••••••••">
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="show-password-checkbox">
-                        <label for="show-password-checkbox">Show password</label>
-                    </div>
-                        <button id="log-in">Confirm</button>
-                    <div class="auth-footer">
-                        <span>Don't have one? <a href="#">Create account</a></span>
+            <div class="window-box-sign-in">
+                <div id="modal-overlay" class="modal-overlay">
+                    <div id="sign-in-box" class="modern-auth-box">
+                        <h2>Sign Up</h2>
+                        <p class="subtitle">Create an account to save your to-do items securely.</p>
+                        <div class="input-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" placeholder="Enter your username">
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" placeholder="••••••••">
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="show-password-checkbox">
+                            <label for="show-password-checkbox">Show password</label>
+                        </div>
+                            <button id="log-in">Confirm</button>
+                        <div class="auth-footer">
+                            <span>Don't have one? <a href="#">Create account</a></span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class = "container">
-            <div class="to-do-list-box">
-
+            <div class="popup-notification">
+                <div class="popup-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--color-indigo-main)">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                    <h3>Task Added!</h3>
+                    <p>Your task has been successfully added to the list.</p>
+                </div>
             </div>
+
+            <div class="duplicate-popup">
+                <div class="duplicate-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--color-indigo-primary)">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    <h3>Duplicate List!</h3>
+                    <p>This list already exists in your to-do list.</p>
+                    <button class="duplicate-close">X</button>
+                </div>
+            </div>
+
+            <div class="login-error-popup">
+                <div class="login-error-content">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--color-indigo-main)">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    <h3>Incorrect Password or Username</h3>
+                    <p>Couldn't sign in. Please check your password and username and try again.</p>
+                    <button class="login-error-close">Try Again</button>
+                </div>
+            </div>
+
+            <div class="to-do-list-container">
+                <div class="to-do-list-box">
+                    <div class="add-list-input">
+                        <input type="text" placeholder="Shopping" id="to-do-list-title">
+                        <button id="add-btn"><img class="icon" src="../Images/plus.svg" alt="plus"></button>
+                    </div>
+                </div>
+                <div class="list-box">
+                    <ul>
+
+                    </ul>
+                </div>
+            </div>
+
         </div>
 
         <script src = "../Js/app.js"></script>
