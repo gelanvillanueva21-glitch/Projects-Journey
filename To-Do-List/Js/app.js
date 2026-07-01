@@ -2,6 +2,9 @@
 
 // VARIABLES
 
+
+
+
 const checkBox = document.getElementById('show-password-checkbox');
 const id = document.getElementById('id');
 const username = document.getElementById('username');
@@ -9,7 +12,7 @@ const password = document.getElementById('password');
 const logInBtn = document.getElementById('log-in');
 
 const errorWindow = document.querySelector('.error-popup');
-const errorCloseBtn = document.querySelector('.error-close');
+const errorCloseBtn2 = document.querySelector('.error-close');
 const addButton = document.getElementById('add-btn');
 const addInputList = document.getElementById('to-do-list-title');
 const toDoList = document.querySelector('.list-box ul');
@@ -35,7 +38,7 @@ checkBox.addEventListener('change', () => {
 
 // 
 
-errorCloseBtn.addEventListener('click', function() {
+errorCloseBtn2.addEventListener('click', function() {
     errorWindow.style.display = 'none';
 })
 

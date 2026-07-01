@@ -46,9 +46,12 @@ class UserAuth(BaseModel):
             )
         return value
 
+class UpdateList(BaseModel):
+    todo_list : Annotated[list[str], Field(default_factory = list)]
+    id : int
 
 class AddItemList(BaseModel):
-    item : str
+    item : Annotated[str, Field(max_length = 35)]
     id : int
 
 
@@ -69,14 +72,17 @@ async def logIn(user : UserAuth):
 
 @app.post("/AddItem")
 async def addItem(data : AddItemList):
-    if data.item:
-        userInfo.info[data.id]["To-Do-List"].append(data.item)
-        updatedList = userInfo.info[data.id]["To-Do-List"]
-        return {
-            "status" : "success",
-            "updated_list" : updatedList
-        }
-    raise HTTPException(status_code = status.HTTP_406_NOT_ACCEPTABLE)
+    if not data.item:
+        raise HTTPException(status_code = status.HTTP_406_NOT_ACCEPTABLE)
+    
+    if len(userInfo.info[data.id]["To-Do-List"]) >= 50:
+        raise HTTPException(status_code = status.HTTP_403_FORBIDDEN)
+    
+    userInfo.info[data.id]["To-Do-List"].append(data.item)
+    return {
+        "status" : "success",
+        "updated_list" : userInfo.info[data.id]["To-Do-List"]
+    }
 
 @app.post("/Register")
 async def register(data : UserAuth):
@@ -93,3 +99,8 @@ async def register(data : UserAuth):
         "To-Do-List" : []
     }
     return {"status" : "success"}
+
+
+@app.put("/DeleteList")
+async def deleteList(itemList : UpdateList):
+    pass
