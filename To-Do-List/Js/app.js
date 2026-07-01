@@ -8,6 +8,8 @@ const username = document.getElementById('username');
 const password = document.getElementById('password');
 const logInBtn = document.getElementById('log-in');
 
+const errorWindow = document.querySelector('.error-popup');
+const errorCloseBtn = document.querySelector('.error-close');
 const addButton = document.getElementById('add-btn');
 const addInputList = document.getElementById('to-do-list-title');
 const toDoList = document.querySelector('.list-box ul');
@@ -17,7 +19,7 @@ const closeBtn = document.querySelector('.duplicate-close');
 const logInError = document.querySelector('.login-error-popup');
 const windowSignIn = document.querySelector('.window-box-sign-in');
 const tryAgainBtn = document.querySelector('.login-error-close');
-
+let globalId = null
 
 // SHOW PASSWORD LAYER
 
@@ -31,12 +33,18 @@ checkBox.addEventListener('change', () => {
 
 });
 
+// 
+
+errorCloseBtn.addEventListener('click', function() {
+    errorWindow.style.display = 'none';
+})
+
 
 // AUTHENTICATION HANDLE
 
 logInBtn.addEventListener('click', async function() {
     try {
-        let tempUser = Number(id.value);
+        let tempUserId = Number(id.value);
         let tempUsername = username.value;
         let tempPassword = password.value;
 
@@ -46,7 +54,7 @@ logInBtn.addEventListener('click', async function() {
                 'Content-Type': 'application/json'
             },
             body : JSON.stringify({
-                userId : tempUser,
+                userId : tempUserId,
                 username : tempUsername,
                 password : tempPassword
             })
@@ -77,6 +85,7 @@ logInBtn.addEventListener('click', async function() {
                 li.appendChild(btn)
                 toDoList.appendChild(li);
             })
+            globalId = tempUserId
         }
         
     } catch (error) {
@@ -93,7 +102,7 @@ tryAgainBtn.addEventListener('click', function() {
 
 // ADD LIST LAYER 
 
-addButton.addEventListener('click', () => {
+addButton.addEventListener('click', async () => {
 
     if (addInputList.value) {
         const allList = document.querySelectorAll('.list-box ul li.list');
@@ -117,7 +126,32 @@ addButton.addEventListener('click', () => {
             li.innerText = addInputList.value
             li.appendChild(btn)
             toDoList.appendChild(li);
-            notiWindow.style.display = 'block';
+            try {
+                
+                let data = await fetch("http://127.0.0.1:8000/AddItem", {
+                    method : 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body : JSON.stringify({
+                        item : addInputList.value,
+                        id : globalId
+                    })
+                })
+                
+                if (!data.ok) {
+                    throw new Error("Error Occured while fetching a data");
+                }
+
+                let result = await data.json();
+                if (result["status"]) {
+                    console.log(result["status"]);
+                    notiWindow.style.display = 'block';
+                }
+            } catch (error) {
+                console.log(error);
+                errorWindow.style.display = 'none';
+            }
         }
     }
 });

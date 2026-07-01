@@ -19,11 +19,11 @@
                         <p class="subtitle">Create an account to save your to-do items securely.</p>
                         <div class="input-group">
                             <label for="id">ID</label>
-                            <input type="text" id="id" placeholder="Enter your ID">
+                            <input type="text" id="id" placeholder="12345">
                         </div>
                         <div class="input-group">
                             <label for="username">Username</label>
-                            <input type="text" id="username" placeholder="Enter your username">
+                            <input type="text" id="username" placeholder="gelan123Mar">
                         </div>
                         <div class="input-group">
                             <label for="password">Password</label>
@@ -35,7 +35,7 @@
                         </div>
                             <button id="log-in">Confirm</button>
                         <div class="auth-footer">
-                            <span>Don't have one? <a href="#">Create account</a></span>
+                            <span>Don't have one? <a href="../Html/create-account.html">Create account</a></span>
                         </div>
                     </div>
                 </div>
@@ -72,6 +72,17 @@
                     <button class="login-error-close">Try Again</button>
                 </div>
             </div>
+
+            <div class="error-popup">
+                <div class="error-content">
+                    <button class="error-close">X</button>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--color-indigo-primary)">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    <h3>Error</h3>
+                    <p>Something error occurred.</p>
+                </div>
+</div>
 
             <div class="to-do-list-container">
                 <div class="to-do-list-box">

@@ -23,8 +23,8 @@ app.add_middleware(
 class UserAuth(BaseModel):
     userId : Annotated[int, Field(
         gt = 99,
-        le = 999999,
-        description = "Id must greater than 99 and less than 999999"
+        le = 100000000000,
+        description = "Id must greater than 99 and less than or equal 100,000,000,000"
     )]
     username : Annotated[str, Field(
         min_length = 3, 
@@ -47,10 +47,16 @@ class UserAuth(BaseModel):
         return value
 
 
+class AddItemList(BaseModel):
+    item : str
+    id : int
+
+
 @app.post("/Login")
 async def logIn(user : UserAuth):
     if user.userId in userInfo.info:
         db_user = userInfo.info[user.userId]
+        tempId = user.userId
         if user.username == db_user.get("Username") and user.password == db_user.get("Password"):
             return {
                 "status" : "success",
@@ -59,3 +65,31 @@ async def logIn(user : UserAuth):
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
     else:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
+
+
+@app.post("/AddItem")
+async def addItem(data : AddItemList):
+    if data.item:
+        userInfo.info[data.id]["To-Do-List"].append(data.item)
+        updatedList = userInfo.info[data.id]["To-Do-List"]
+        return {
+            "status" : "success",
+            "updated_list" : updatedList
+        }
+    raise HTTPException(status_code = status.HTTP_406_NOT_ACCEPTABLE)
+
+@app.post("/Register")
+async def register(data : UserAuth):
+    if data.userId in userInfo.info:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+    taken_usernames = userInfo.taken_user
+    
+    if data.username in taken_usernames:
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+    userInfo.taken_user.add(data.username)
+    userInfo.info[data.userId] = {
+        "Username" : data.username,
+        "Password" : data.password,
+        "To-Do-List" : []
+    }
+    return {"status" : "success"}

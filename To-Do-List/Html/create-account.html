@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Create Account</title>
+        <link rel="stylesheet" href="../Css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="container">
+
+            <div class="account-exists-popup">
+                <div class="account-exists-content">
+                    <button class="account-exists-close">X</button>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--color-indigo-primary)">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                    <h3>Account Already Exists!</h3>
+                    <p>ID, username, or password already exists. Please use different values.</p>
+                    <button class="account-exists-try-again">Try Again</button>
+                </div>
+            </div>
+
+
+            <div class="modal-overlay create-account-overlay">
+                <div class="modern-auth-box create-account-box">
+                    <h2>Create Account</h2>
+                    <p class="subtitle">Join us to save your to-do items securely.</p>
+                    <div class="input-group">
+                        <label for="create-id">ID</label>
+                        <input type="text" id="create-id" placeholder="12345">
+                    </div>
+                    <div class="input-group">
+                        <label for="create-username">Username</label>
+                        <input type="text" id="create-username" placeholder="gelan123Mar">
+                    </div>
+                    <div class="input-group">
+                        <label for="create-password">Password</label>
+                        <input type="password" id="create-password" placeholder="••••••••">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="create-show-password-checkbox">
+                        <label for="create-show-password-checkbox">Show password</label>
+                    </div>
+                    <button id="create-account-btn">Create Account</button>
+                    <div class="auth-footer">
+                        <span>Already have an account? <a href="index.html">Sign In</a></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../Js/create-account.js"></script>
+    </body>
+</html>

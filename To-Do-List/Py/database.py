@@ -11,3 +11,4 @@ class UsersInfo():
                 ]
             }
         }
+        self.taken_user = set()
