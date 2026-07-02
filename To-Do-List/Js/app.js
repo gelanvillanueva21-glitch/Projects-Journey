@@ -3,7 +3,9 @@
 // VARIABLES
 
 
-
+const deleteConfirmWindow = document.querySelector('.delete-confirm-popup');
+const confirmNo = document.querySelector('.delete-confirm-no');
+const confirmYes = document.querySelector('.delete-confirm-yes');
 
 const checkBox = document.getElementById('show-password-checkbox');
 const id = document.getElementById('id');
@@ -22,6 +24,7 @@ const closeBtn = document.querySelector('.duplicate-close');
 const logInError = document.querySelector('.login-error-popup');
 const windowSignIn = document.querySelector('.window-box-sign-in');
 const tryAgainBtn = document.querySelector('.login-error-close');
+var trashBtn = null
 let globalId = null
 
 // SHOW PASSWORD LAYER
@@ -86,6 +89,11 @@ logInBtn.addEventListener('click', async function() {
                 img.classList.add('image');
                 li.innerText = list
                 li.appendChild(btn)
+                let cleanItem = li.childNodes[0].textContent.trim();
+                btn.addEventListener('click', () => {
+                        setupDeletion(cleanItem);
+                    });
+
                 toDoList.appendChild(li);
             })
             globalId = tempUserId
@@ -128,6 +136,11 @@ addButton.addEventListener('click', async () => {
             img.classList.add('image');
             li.innerText = addInputList.value
             li.appendChild(btn)
+            let cleanItem = li.childNodes[0].textContent.trim();
+            btn.addEventListener('click', () => {
+                setupDeletion(cleanItem);
+            });
+
             toDoList.appendChild(li);
             try {
                 
@@ -176,3 +189,50 @@ closeBtn.addEventListener('click', () => {
     alreadyExistWindow.style.display = 'none';
 
 });
+
+
+// DELETE LIST COMPONENTS LAYER
+
+let elementPending = null
+
+
+function setupDeletion(listItem) {
+    elementPending = listItem;
+    deleteConfirmWindow.style.display = 'block';
+}
+
+confirmNo.addEventListener('click', () => {
+    deleteConfirmWindow.style.display = 'none';
+})
+
+confirmYes.addEventListener('click', () => {
+    const allList = document.querySelectorAll('.list-box ul li.list');
+    const listBox = document.querySelector('.list-box ul');
+    const updatedList = []
+    allList.forEach((item) => {
+        if (elementPending !== item.childNodes[0].textContent.trim()) {
+            let cleanItem = item.childNodes[0].textContent.trim();
+            console.log(cleanItem);
+            updatedList.push(cleanItem);
+        }
+    })
+    listBox.innerHTML = '';
+    if (updatedList === []) {
+        return
+    }
+
+    updatedList.forEach((item) => {
+        let li = document.createElement('li');
+        li.classList.add('list');
+        let btn = document.createElement('button');
+        btn.classList.add('trash-btn');
+        let img = document.createElement('img');
+        img.src = '../Images/trash.svg';
+        btn.appendChild(img);
+        img.classList.add('image');
+        li.innerText = item
+        li.appendChild(btn)
+        listBox.appendChild(li);
+    })
+    deleteConfirmWindow.style.display = 'none'
+})
