@@ -48,6 +48,7 @@ class UserAuth(BaseModel):
 
 class UpdateList(BaseModel):
     todo_list : Annotated[list[str], Field(default_factory = list)]
+    deleted_list : str
     id : int
 
 class AddItemList(BaseModel):
@@ -102,5 +103,15 @@ async def register(data : UserAuth):
 
 
 @app.put("/DeleteList")
-async def deleteList(itemList : UpdateList):
-    pass
+async def deleteList(data : UpdateList):
+    if data.id in userInfo.info:
+        updatedList = data.todo_list
+        userInfo.deleted_List.append(data.deleted_list)
+        userInfo.info[data.id]["To-Do-List"] = updatedList
+        todoList = userInfo.info[data.id]["To-Do-List"]
+        return {
+            "status" : "succes",
+            "deleted-list" : userInfo.deleted_List,
+            "updated-list" : todoList
+        }
+    raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)

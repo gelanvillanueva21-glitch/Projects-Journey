@@ -27,6 +27,9 @@ const tryAgainBtn = document.querySelector('.login-error-close');
 var trashBtn = null
 let globalId = null
 
+// CHECK IF ALREADY LOG IN THIS DEVICE
+
+
 // SHOW PASSWORD LAYER
 
 checkBox.addEventListener('change', () => {
@@ -74,9 +77,7 @@ logInBtn.addEventListener('click', async function() {
         if (data['status']) {
             windowSignIn.style.display = 'none';
             let userList = data['todo_list'];
-            if (userList === []) {
-                return
-            }
+            if (userList.length === 0) { return }
             
             userList.forEach((list) => {
                 let li = document.createElement('li');
@@ -87,15 +88,11 @@ logInBtn.addEventListener('click', async function() {
                 img.src = '../Images/trash.svg';
                 btn.appendChild(img);
                 img.classList.add('image');
-                li.innerText = list
-                li.appendChild(btn)
-                let cleanItem = li.childNodes[0].textContent.trim();
-                btn.addEventListener('click', () => {
-                        setupDeletion(cleanItem);
-                    });
-
+                li.innerText = list;
+                li.appendChild(btn);
                 toDoList.appendChild(li);
             })
+            localStorage.setItem('id' , tempUserId);
             globalId = tempUserId
         }
         
@@ -134,12 +131,8 @@ addButton.addEventListener('click', async () => {
             img.src = '../Images/trash.svg';
             btn.appendChild(img);
             img.classList.add('image');
-            li.innerText = addInputList.value
-            li.appendChild(btn)
-            let cleanItem = li.childNodes[0].textContent.trim();
-            btn.addEventListener('click', () => {
-                setupDeletion(cleanItem);
-            });
+            li.innerText = addInputList.value;
+            li.appendChild(btn);
 
             toDoList.appendChild(li);
             try {
@@ -194,18 +187,34 @@ closeBtn.addEventListener('click', () => {
 // DELETE LIST COMPONENTS LAYER
 
 let elementPending = null
+const ulBox = document.querySelector('.list-box ul');
 
 
-function setupDeletion(listItem) {
-    elementPending = listItem;
-    deleteConfirmWindow.style.display = 'block';
-}
+ulBox.addEventListener('click', (e) => {
+
+    const trashBtn = e.target.closest('.trash-btn');
+
+    if (trashBtn) {
+        let parentTrashBtn = trashBtn.parentElement;
+        elementPending = parentTrashBtn.childNodes[0].textContent.trim();
+        console.log(elementPending);
+        deleteConfirmWindow.style.display = 'block';
+    }
+    if (!trashBtn) {
+        e.target.classList.toggle('completed');
+        if (e.target.classList.contains('completed'))
+            e.target.style.borderColor = '#10b981';
+        else
+            e.target.style.borderColor = '';
+    } 
+})
+
 
 confirmNo.addEventListener('click', () => {
     deleteConfirmWindow.style.display = 'none';
 })
 
-confirmYes.addEventListener('click', () => {
+confirmYes.addEventListener('click', async () => {
     const allList = document.querySelectorAll('.list-box ul li.list');
     const listBox = document.querySelector('.list-box ul');
     const updatedList = []
@@ -217,9 +226,7 @@ confirmYes.addEventListener('click', () => {
         }
     })
     listBox.innerHTML = '';
-    if (updatedList === []) {
-        return
-    }
+    if (updatedList.length === 0) { return }
 
     updatedList.forEach((item) => {
         let li = document.createElement('li');
@@ -234,5 +241,33 @@ confirmYes.addEventListener('click', () => {
         li.appendChild(btn)
         listBox.appendChild(li);
     })
+
+
+    try {
+        
+        let result = await fetch('http://127.0.0.1:8000/DeleteList', {
+            method : 'PUT',
+            headers : {'Content-Type' : 'application/json'},
+            body : JSON.stringify({
+                todo_list : updatedList,
+                deleted_list : elementPending,
+                id : globalId
+            })
+        });
+
+        if (!result.ok) {
+            throw new Error("Error Occurred During Fetching Data");
+        }
+        let data = await result
+        deleteConfirmWindow.style.display = 'none';
+        console.log(data['deleted-list']);
+
+    } catch (error) {
+        errorWindow.style.display = 'block';
+    }
+
+
     deleteConfirmWindow.style.display = 'none'
 })
+
+// CHECK BUTTON
