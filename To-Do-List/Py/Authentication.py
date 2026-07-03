@@ -114,9 +114,3 @@ async def deleteList(data : UpdateList):
             "deleted-list" : userInfo.deleted_List,
             "updated-list" : todoList
         }
-    raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
-
-
-@app.get("/GetItem")
-async def getItemList(id : Annotated[int, Field(gt = 99, le = 100000000000)]):
-    pass

@@ -29,15 +29,6 @@ let globalId = null
 
 // CHECK IF ALREADY LOG IN THIS DEVICE
 
-window.addEventListener('DOMContentLoaded', async () => {
-    const savedUserId = localStorage.getItem('id');
-
-    if (!savedUserId) {
-        return
-    }
-
-    
-})
 
 // SHOW PASSWORD LAYER
 
