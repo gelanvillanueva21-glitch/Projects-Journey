@@ -44,7 +44,6 @@ createAccBtn.addEventListener('click', async () => {
     try {
         
         if (createId.value === '' || createUser.value === '' || createPass.value === '') {
-            console.log("Hell World");
             emptyInputWindow.style.display = 'block';
             return
         }
@@ -77,7 +76,6 @@ createAccBtn.addEventListener('click', async () => {
         succesWindow.style.display = 'block';
 
     } catch (error) {
-        console.log(error);
         errorP.innerText = error;
         errorPopup.style.display = 'block';
     }

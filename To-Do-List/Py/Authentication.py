@@ -56,6 +56,11 @@ class AddItemList(BaseModel):
     id : int
 
 
+class CheckedList(BaseModel):
+    checked_list : list[str] = [],
+    id : int
+
+
 @app.post("/Login")
 async def logIn(user : UserAuth):
     if user.userId in userInfo.info:
@@ -64,7 +69,8 @@ async def logIn(user : UserAuth):
         if user.username == db_user.get("Username") and user.password == db_user.get("Password"):
             return {
                 "status" : "success",
-                "todo_list" : db_user.get("To-Do-List", [])
+                "todo_list" : db_user.get("To-Do-List", []),
+                "checked_list" : db_user.get("Checked-List", [])
             }
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
     else:
@@ -97,7 +103,8 @@ async def register(data : UserAuth):
     userInfo.info[data.userId] = {
         "Username" : data.username,
         "Password" : data.password,
-        "To-Do-List" : []
+        "To-Do-List" : [],
+        "Checked-List" : []
     }
     return {"status" : "success"}
 
@@ -114,3 +121,29 @@ async def deleteList(data : UpdateList):
             "deleted-list" : userInfo.deleted_List,
             "updated-list" : todoList
         }
+
+
+
+@app.put("/UpdateChecked")
+async def updateCheckList(data : CheckedList):
+    if data.id in userInfo.info:
+        userInfo.info[data.id]["Checked-List"] = data.checked_list
+        return {
+            "status" : "success",
+            "updated-checked-list" : userInfo.info[data.id]["Checked-List"]
+        }
+    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
+
+
+
+@app.get("/GetItems")
+async def getListItems(id : Annotated[int, Field(ge = 99, le = 100000000000)]):
+    if id in userInfo.info:
+        return {
+            "status" : "succes",
+            "item-list" : userInfo.info[id]["To-Do-List"],
+            "checked-item" : userInfo.info[id]["Checked-List"]
+        }
+    raise HTTPException(status_code = status.HTTP_403_FORBIDDEN)
+
+

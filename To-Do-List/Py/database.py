@@ -8,6 +8,9 @@ class UsersInfo():
                 "To-Do-List" : [
                     "Buy some groceries",
                     "Train calisthenics"
+                ],
+                "Checked-List" : [
+                    "Buy some groceries"
                 ]
             }
         }

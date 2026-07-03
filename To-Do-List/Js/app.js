@@ -29,6 +29,56 @@ let globalId = null
 
 // CHECK IF ALREADY LOG IN THIS DEVICE
 
+window.addEventListener('DOMContentLoaded', async () => {
+
+    const savedId = localStorage.getItem('id');
+    if (!savedId) { return }
+    globalId = Number(savedId);
+
+    try {
+
+        let result = await fetch(`http://127.0.0.1:8000/GetItems?id=${globalId}`);
+
+        if (!result.ok) {
+            throw new Error("Something error occured During fetching data");
+        }
+        windowSignIn.style.display = 'none';
+        let data = await result.json();
+        let itemList = data["item-list"];
+        let checkedList = data["checked-list"]
+
+        if (itemList.length !== 0) {
+            itemList.forEach((list) => {
+                let li = document.createElement('li');
+                li.classList.add('list');
+                let btn = document.createElement('button');
+                btn.classList.add('trash-btn');
+                let img = document.createElement('img');
+                img.src = '../Images/trash.svg';
+                img.classList.add('image');
+                btn.appendChild(img);
+                li.innerText = list
+                li.appendChild(btn);
+                toDoList.appendChild(li);
+            })
+        }
+
+        if (checkedList.length === 0) { return }
+            let allNotes = document.querySelectorAll('.list-box ul li.list');
+            allNotes.forEach((item) => {
+                tempItem = item.childNodes[0].textContent.trim();
+                if (checkedList.includes(tempItem)) {
+                    item.classList.add('completed');
+                    item.style.borderColor = '#10b981';
+                }
+            })
+
+    } catch (error) {
+        errorWindow.style.display = 'block';
+    }
+
+})
+
 
 // SHOW PASSWORD LAYER
 
@@ -77,6 +127,9 @@ logInBtn.addEventListener('click', async function() {
         if (data['status']) {
             windowSignIn.style.display = 'none';
             let userList = data['todo_list'];
+            let checkedList = data['checked_list'];
+            localStorage.setItem('id' , tempUserId);
+            globalId = tempUserId
             if (userList.length === 0) { return }
             
             userList.forEach((list) => {
@@ -92,8 +145,16 @@ logInBtn.addEventListener('click', async function() {
                 li.appendChild(btn);
                 toDoList.appendChild(li);
             })
-            localStorage.setItem('id' , tempUserId);
-            globalId = tempUserId
+
+            if (checkedList.length === 0) { return }
+            let allNotes = document.querySelectorAll('.list-box ul li.list');
+            allNotes.forEach((item) => {
+                tempItem = item.childNodes[0].textContent.trim();
+                if (checkedList.includes(tempItem)) {
+                    item.classList.add('completed');
+                    item.style.borderColor = '#10b981';
+                }
+            })
         }
         
     } catch (error) {
@@ -154,11 +215,9 @@ addButton.addEventListener('click', async () => {
 
                 let result = await data.json();
                 if (result["status"]) {
-                    console.log(result["status"]);
                     notiWindow.style.display = 'block';
                 }
             } catch (error) {
-                console.log(error);
                 errorWindow.style.display = 'none';
             }
         }
@@ -190,22 +249,49 @@ let elementPending = null
 const ulBox = document.querySelector('.list-box ul');
 
 
-ulBox.addEventListener('click', (e) => {
+ulBox.addEventListener('click', async (e) => {
 
     const trashBtn = e.target.closest('.trash-btn');
 
     if (trashBtn) {
         let parentTrashBtn = trashBtn.parentElement;
         elementPending = parentTrashBtn.childNodes[0].textContent.trim();
-        console.log(elementPending);
         deleteConfirmWindow.style.display = 'block';
     }
     if (!trashBtn) {
+        const allList = document.querySelectorAll('.list-box ul li.list');
+        let updatedCheckList = [];
         e.target.classList.toggle('completed');
-        if (e.target.classList.contains('completed'))
+        if (e.target.classList.contains('completed')) {
             e.target.style.borderColor = '#10b981';
-        else
+        }
+        else {
             e.target.style.borderColor = '';
+        }
+
+        allList.forEach((item) => {
+            if (item.classList.contains('completed')) {
+                updatedCheckList.push(item.childNodes[0].textContent.trim());
+            }
+        })
+
+        try {
+            
+            let result = await fetch("http://127.0.0.1:8000/UpdateChecked", {
+                method : "PUT",
+                headers : {'Content-Type' : 'application/json'},
+                body : JSON.stringify({
+                    checked_list : updatedCheckList,
+                    id : globalId
+                })
+            })
+
+            if (!result.ok) {
+                throw new Error("Error Occurred During Fetching Data");
+            }
+        } catch (error) {
+            errorWindow.style.display = 'block';
+        }
     } 
 })
 
@@ -221,7 +307,6 @@ confirmYes.addEventListener('click', async () => {
     allList.forEach((item) => {
         if (elementPending !== item.childNodes[0].textContent.trim()) {
             let cleanItem = item.childNodes[0].textContent.trim();
-            console.log(cleanItem);
             updatedList.push(cleanItem);
         }
     })
@@ -260,7 +345,6 @@ confirmYes.addEventListener('click', async () => {
         }
         let data = await result
         deleteConfirmWindow.style.display = 'none';
-        console.log(data['deleted-list']);
 
     } catch (error) {
         errorWindow.style.display = 'block';
@@ -269,5 +353,3 @@ confirmYes.addEventListener('click', async () => {
 
     deleteConfirmWindow.style.display = 'none'
 })
-
-// CHECK BUTTON
