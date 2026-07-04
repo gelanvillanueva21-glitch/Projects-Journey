@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Notes</title>
+
+        <!-- STYLESHEET -->
+        <link rel="stylesheet" href="../Css/style.css">
+        <link rel="stylesheet" href="../Css/weather.css">
+        <link rel="stylesheet" href="../Css/quirie.css">
+        <style>
+            .icon {
+                width: 6rem;
+            }
+            .box p {
+                font-size: 2rem;
+            }
+        </style>
+
+        <!-- ICON -->
+        <link rel="icon" href="../Image/note-text.svg">
+
+        <!-- FONT FAMILY -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Fjalla+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Oswald&family=Pliant:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+        <div id="window-box-search">
+            <div id="window-search">
+                <input type = "text" placeholder = "Search title..." id = "search-note-title">
+                <button id = "search">Search</button>
+            </div>
+        </div>
+        <div id="search-outcome-box">
+            <ul id="list-outcome">
+                
+            </ul>
+        </div>
+        <div id="window-title-box">
+            <div id="window-title">
+                <input type="text" id="add-notes-title" placeholder="Enter title...">
+                <button id="confirm-button">Confirm</button>
+            </div>
+        </div>
+        <div id="window-delete-confirm">
+            <div id="delete-confirm">
+                <div id="heading-word">
+                    Are you sure you want to delete this note?
+                </div>
+                <div class="box-btn">
+                    <button class="btn" id="no">No</button>
+                    <button class="btn" id="confirm">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+        <div id = "container">
+            <div id = "side-bar-box">
+                <div class="box-button">
+                    <button id = "title-button">
+                    <img src = "../Image/notebook.svg" alt = "Note-book" style = "width: 5rem;">
+                    <h1><span class = "highlighted-text">Note</span>-Pad</h1>
+                    </button>
+                </div>
+                <div id="button-box">
+                    <button id = "search-note">
+                        <img src = "../Image/search-circle.svg" style = "width: 40px;">
+                    </button>
+                    <button id = "add-note">
+                        <img src = "../Image/plus-circle.svg" style = "width: 40px;">
+                    </button>
+                    <button class="delete-note">
+                        <img src = "../Image/trash-circle.svg" style = "width: 40px;">
+                    </button>
+                    <button id="save-note">
+                        <img src = "../Image/save.svg" style = "width: 25px;">
+                    </button>
+                </div>
+                <div id = "saved-note-box">
+                    <ul id = "saved-note-list">
+
+                    </ul>
+                </div>
+            </div>
+            
+            <div id = "container-pad">
+                <div id="title-box">
+                    <h1 id="heading-title">Title</h1>
+                </div>
+                <div id = "text-box">
+                    <textarea id="note-content" placeholder="Start typing your note..."></textarea>
+                    <div id="weather-container">
+                        <div id="weather-box">
+                            <header>
+                                <nav id="navigation-bar">
+                                    <img src="../Image/weather.svg" alt="" width="75px">
+                                    <input type="text" id="search-city" placeholder="Search e.g. Bacolod City">
+                                    <button id="search-btn">Search</button>
+                                </nav>
+                                <section id="hero-section">
+                                    <div id="city-title">
+                                        <img src="../Image/skyline.svg" alt="" style='width: 7rem;'>
+                                        <h1 id="heading-city">CITY</h1>
+                                    </div>
+                                    <div id="main-weather">
+                                        <ul>
+                                            <li id="weather-btn"><img class="icon" src="../Image/weather.svg" alt=""></li>
+                                            <li id="wind-btn"><img class="icon" src="../Image/wind.svg" alt=""></li>
+                                            <li id="temperature-btn"><img class="icon" src="../Image/temperature-svgrepo-com.svg" alt=""></li>
+                                            <li id="time-btn"><img class="icon"  src="../Image/time.svg" alt=""></li>
+                                        </ul>
+                                    </div>
+                                    <div id="city-content-weather">
+                                        <div class="box" id="weather-description">
+                                            <h2 id="h2-weather"></h2>
+                                            <p id="paragraph-weather"></p>
+                                        </div>
+                                        <div class="box" id="wind-content">
+                                            <h2 id="h2-wind"></h2>
+                                            <p id="paragraph-wind"></p>
+                                        </div>
+                                        <div class="box" id="temperature-content">
+                                            <h2 id="h2-temperature"></h2>
+                                            <p id="paragraph-temperature"></p>
+                                        </div>
+                                        <div class="box" id="time-content">
+                                            <h2 id="h2-time"></h2>
+                                            <p id="paragraph-time"></p>
+                                        </div>
+                                    </div>
+                                </section>
+                            </header>
+                            <main>
+
+                            </main>
+                        </div>
+                    </div>
+
+
+
+                    <div id="calculator-container">
+                        <div id="calculator-history-box">
+                            <div id="calculator-history-content">
+                                <ul id="history-box">
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="calculator-box">
+                            <div id="calculator-content">
+                                <input type="text" id="display-input" readonly>
+                                <div id="calculator-components">
+                                    <button class = "operator">+</button>
+                                    <button>7</button>
+                                    <button>8</button>
+                                    <button>9</button>
+                                    <button class = "operator">-</button>
+                                    <button>4</button>
+                                    <button>5</button>
+                                    <button>6</button>
+                                    <button class = "operator">x</button>
+                                    <button>1</button>
+                                    <button>2</button>
+                                    <button>3</button>
+                                    <button class = "operator">/</button>
+                                    <button>0</button>
+                                    <button>.</button>
+                                    <button id = "equals">=</button>
+                                    <button class = "operator">C</button>
+                                    <button>00</button>
+                                    <button>000</button>
+                                    <button onclick="deleteNumber()">⌫</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <!-- JAVA SCRIPT -->
+        <script src="../Js/app.js"></script>
+        <script src="../Js/weather.js"></script>
+    </body>
+</html>

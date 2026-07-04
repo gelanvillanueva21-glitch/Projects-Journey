@@ -1,0 +1,545 @@
+
+/* GLOBAL */
+
+html {
+    font-size: 62.5%;
+}
+
+:root {
+    /* COLORS */
+    --primary-color: #ffffff;
+    --secondary-color: #000000;
+    --grey-color: #d4dbe2;
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Pliant', sans-serif;
+}
+
+body {
+    background-color: #6f4e37;
+    height: 100vh;
+    justify-items: center;
+    align-content: center;
+}
+
+h1 {
+    font-size: 3rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+li {
+    list-style: none;
+}
+
+/* WINDOW */
+
+#window-box-search {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: 5;
+}
+
+#window-search {
+    width: 400px;
+    height: 100px;
+    background-color: var(--primary-color);
+    border: 2px black solid;
+    border-radius: 15px;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    box-shadow: 0px 0px 5px var(--grey-color);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+
+    animation: window;
+    animation-duration: 0.4s;
+
+}
+
+
+
+#search-note-title {
+    font-size: 2rem;
+    outline: none;
+    border: none;
+    padding: 10px;
+}
+
+#search {
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    border: 2px black solid;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+
+    font-size: 1.5rem;
+}
+
+#search:hover {
+    background-color: black;
+    color: white;
+}
+
+#search:active {
+    transform: scale(1.05);
+}
+
+#window-title-box {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: 5;
+}
+
+#window-title {
+    width: 400px;
+    height: 100px;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+
+    border: 2px black solid;
+    border-radius: 15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 0px 5px var(--grey-color);
+
+    animation: window;
+    animation-duration: 0.4s;
+}
+
+#add-notes-title {
+    font-size: 2rem;
+    outline: none;
+    border: none;
+    padding: 10px;
+}
+
+#confirm-button {
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    border: 2px black solid;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+
+    font-size: 1.5rem;
+}
+
+#confirm-button:hover {
+    background-color: black;
+    color: white;
+}
+
+#confirm-button:active {
+    transform: scale(1.05);
+}
+
+
+@keyframes window {
+    from {
+        top: 0%;
+        opacity: 0;
+    } to {
+        top: 50%;
+        opacity: 1;
+    }
+}
+
+/* COMPONENTS */
+
+#container {
+    width: 90%;
+    height: 90vh;
+    background-color: var(--primary-color);
+
+    border-radius: 12px;
+    display: flex;
+}
+
+#side-bar-box {
+    width: 30%;
+    height: 100%;
+    border-right: 5px black solid;
+}
+
+.box-button {
+    width: 100%;
+    height: 15%;
+    border-bottom: 2px solid black;
+    align-content: center;
+}
+
+#title-button {
+    background-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 5px;
+    margin: 0 auto;
+
+
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.4s;
+
+    position: relative;
+}
+
+#title-button:hover, #title-button:active {
+    background-color: var(--grey-color);
+}
+
+.highlighted-text {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+    padding: 5px;
+    border-radius: 8px;
+}
+
+#button-box {
+    width: 100%;
+    height: 10%;
+    border-bottom: 2px black solid;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#button-box::selection {
+    background-color: white;
+}
+
+#button-box img {
+    display: block;
+    justify-self: center;
+    align-self: center;
+}
+
+#search-note, #add-note, .delete-note {
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+}
+
+#save-note {
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px black solid;
+    border-radius: 50%;
+}
+
+#search-note:active {
+    background-color: blue;
+    transform: scale(1.05);
+    border-radius: 50%;
+}
+
+#add-note:active {
+    background-color: green;
+    transform: scale(1.05);
+    border-radius: 50%;
+}
+
+#save-note:active {
+    background-color: green;
+    transform: scale(1.05);
+    border-radius: 50%;
+}
+
+.delete-note:active {
+    background-color: red;
+    transform: scale(1.05);
+    border-radius: 50%;
+}
+
+.delete-btn {
+    background-color: white;
+}
+
+/* DELETE WINDOW */
+
+
+
+#window-delete-confirm {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    z-index: 5;
+}
+
+#delete-confirm {
+    padding: 20px;
+    background-color: var(--primary-color);
+    display: flex;
+    gap: 20px;
+    flex-direction: column;
+    align-items: center;
+
+    border: 2px black solid;
+    border-radius: 15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0px 0px 5px var(--grey-color);
+
+    animation: window;
+    animation-duration: 0.4s;
+}
+
+#heading-word {
+    font-size: 2rem;
+}
+
+.box-btn {
+    display: flex;
+    gap: 30px;
+}
+
+.btn {
+    font-size: 1.5rem;
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: black 2px solid;
+    transition: 0.3s ease;
+}
+
+.btn:hover, .btn:active {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.btn:active {
+    transform: scale(1.05);
+}
+
+
+/* PAD AREA */
+
+#container-pad {
+    height: 100%;
+    width: 100%;
+}
+
+#title-box {
+    width: 100%;
+    height: 5%;
+    padding: 20px;
+}
+
+#heading-title {
+    font-size: 5rem;
+}
+
+#text-box {
+    margin-top: 5%;
+    flex: 1;
+    height: 90%;
+    padding: 20px;
+}
+
+#note-content {
+    width: 100%;
+    height: 95%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-size: 1.6rem;
+    font-family: 'Pliant', sans-serif;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+
+/* SAVED NOTES LIST */
+
+#saved-note-box {
+    width: 100%;
+    height: 70%;
+    margin-top: 5%;
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+#saved-note-box::-webkit-scrollbar {
+    display: none;
+}
+
+#saved-note-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.list {
+    width: 90%;
+    padding: 10px;
+    margin: 5px 10px;
+    font-size: 2rem;
+    color: var(--secondary-color);
+    border-radius: 10px;
+
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.list:hover {
+    background-color: var(--grey-color);
+}
+
+/* CALCULATOR COMPONENTS */
+
+
+#calculator-container {
+    display: none;
+    position: absolute;
+    justify-content: space-evenly;
+    top: 55%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    width: 65%;
+}
+
+#calculator-box {
+    position: relative;
+    background-color: hsl(0 1% 15%);
+    border-radius: 20px;
+    width: 340px;
+}
+
+#calculator-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+#display-input {
+    width: 100%;
+    height: 50px;
+    background-color: hsl(0 1% 20%);
+    border: none;
+    font-size: 2rem;
+    padding: 5px;
+    justify-items: flex-end;
+    color: white;
+}
+
+#calculator-components {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#calculator-content button {
+    width: 65px;
+    height: 65px;
+    font-size: 2rem;
+    border-radius: 50%;
+    background-color: hsl(0 1% 30%);
+    color: var(--primary-color);
+    border: none;
+    cursor: pointer;
+}
+
+
+#calculator-content button:hover {
+    background-color: hsl(0 1% 40%);
+}
+
+
+#calculator-content button:active {
+    background-color: hsl(0 1% 50%);
+}
+
+#calculator-content .operator {
+    background-color: orange;
+}
+
+#calculator-content .operator:hover {
+    background-color: hsl(39, 100%, 65%);
+}
+
+#calculator-content .operator:active {
+    background-color: hsl(39, 100%, 75%);
+}
+
+
+
+/* CALCULATOR HISTORY */
+
+#calculator-history-box {
+    /* display: none; */
+    position: relative;
+    border: 5px var(--grey-color) solid;
+    border-radius: 20px;
+    width: 340px;
+    height: 470px;
+    overflow-y: auto;
+}
+
+#calculator-history-content {
+    overflow-y: scroll;
+    height: 100%;
+}
+
+#calculator-history-content::-webkit-scrollbar {
+    display: block;
+    width: 8px;
+}
+
+#calculator-history-content::-webkit-scrollbar-thumb {
+    background-color: var(--grey-color);
+    border-radius: 4px;
+}
+
+.second-list {
+    width: 90%;
+    padding: 10px;
+    margin: 5px 10px;
+    font-size: 2rem;
+    color: var(--secondary-color);
+    border: 2px var(--secondary-color) solid;
+    border-radius: 10px;
+    cursor: default;
+}
+

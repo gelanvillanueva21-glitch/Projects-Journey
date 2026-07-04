@@ -1,0 +1,112 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Rubik', sans-serif;
+}
+
+
+body {
+    height: 100vh;
+    background: url(Image/office-bg.jpeg) no-repeat center center/ cover;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#add-container-task {
+    width: 350px;
+    padding: 20px 10px;
+    background-color: white;
+    border-radius: 20px;
+
+    display: flex;
+    align-items: center;
+    align-items: center;
+}
+
+input {
+    flex: 4.5;
+    margin-right: 15px;
+    border-radius: 10px;
+    font-size: 1.25rem;
+    padding: 5px;
+
+    cursor: default;
+}
+
+#add-task {
+    flex: 1;
+    transition: all 0.3s;
+    padding: 5px;
+    border: black 2px solid;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#add-task:hover {
+    border: green 2px solid;
+}
+
+#add-task:active {
+    background-color: green;
+}
+
+.icon {
+    width: 20px;
+}
+
+#task-container {
+    width: 350px;
+    margin-top: 20px;
+}
+
+.task {
+    width: 100%;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 3px;
+
+    padding: 10px;
+    margin-bottom: 10px;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+.task li {
+    list-style: none;
+    flex: 4;
+    padding: 5px;
+    font-size: 1.3rem;
+    margin: 5px;
+}
+
+.task button {
+    flex: 1;
+    border-radius: 10px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.task .checkTask {
+    margin-right: 10px;
+    border: 2px green solid;
+    transition: all 0.3s ease;
+}
+
+.task .checkTask:active {
+    background-color: green;
+}
+
+.task .delete {
+    border: 2px red solid;
+    transition: all 0.3s ease;
+}
+
+.task .delete:active {
+    background-color: red;
+}

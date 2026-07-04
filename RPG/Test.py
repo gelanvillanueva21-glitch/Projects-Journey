@@ -1,0 +1,17 @@
+import GameInventory as inventory
+
+inv = inventory.Inventory()
+inv.addItem(["Potion" ,"Health Potion"])
+inv.addItem(["Potion" ,"Damage Potion"])
+inv.addItem(["Potion" ,"Damage Potion"])
+inv.addItem(["Potion" ,"Critical Potion"])
+inv.addItem(["Potion" ,"Damage Potion"])
+inv.addItem(["Armor" ,"Diamond Helmet"])
+inv.addItem(["Armor" ,"Diamond Leggings"])
+inv.addItem(["Armor" ,"Iron Helmet"])
+inv.addItem(["Armor" ,"Gold Helmet"])
+inv.addItem(["Armor" ,"Diamond Helmet"])
+inv.addItem(["Armor" ,"Excalibur Helmet"])
+inv.addItem(["Armor" ,"Iron Chestplate"])
+inv.printItems()
+print(inv.isEmpty())
