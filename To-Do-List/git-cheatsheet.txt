@@ -1,0 +1,61 @@
+# 1. Add files
+git add .
+
+# 2. Commit
+git commit -m "Your message"
+
+# 3. Push to GitHub
+git push origin main
+
+# 4. Pull from GitHub
+git pull origin main
+
+# 5. Check what's changed
+git status
+
+# 6. See all branches
+git branch
+
+
+# Create NEW branch AND switch to it
+git checkout -b new-branch-name
+
+# Example:
+git checkout -b feature-backend
+
+
+# Check you're on it
+git branch
+
+# Switch back to main
+git checkout main
+
+# Push new branch to GitHub
+git push origin new-branch-name
+
+# 1. Delete bad .git folder
+Remove-Item -Recurse -Force .git
+
+# 2. Reinitialize
+git init
+
+# 3. Create main branch
+git checkout -b main
+
+# 4. Add and commit
+git add .
+git commit -m "Initial commit"
+
+# 5. Add remote
+git remote add origin https://github.com/USERNAME/PROJECT.git
+
+# 6. Push
+git push origin main
+
+# Option 1: Pull first, then push
+git pull origin main
+git push origin main
+
+# Option 2: If unrelated histories
+git pull origin main --allow-unrelated-histories
+git push origin main
