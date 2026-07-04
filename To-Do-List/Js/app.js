@@ -45,7 +45,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         windowSignIn.style.display = 'none';
         let data = await result.json();
         let itemList = data["item-list"];
-        let checkedList = data["checked-list"]
+        let checkedList = data["checked-item"];
+        console.log("Item List: " ,itemList);
+        console.log("Check List :" , checkedList);
 
         if (itemList.length !== 0) {
             itemList.forEach((list) => {
@@ -66,12 +68,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         if (checkedList.length === 0) { return }
             let allNotes = document.querySelectorAll('.list-box ul li.list');
             allNotes.forEach((item) => {
-                tempItem = item.childNodes[0].textContent.trim();
-                if (checkedList.includes(tempItem)) {
-                    item.classList.add('completed');
-                    item.style.borderColor = '#10b981';
-                }
-            })
+            tempItem = item.childNodes[0].textContent.trim();
+            if (checkedList.includes(tempItem)) {
+                item.classList.add('completed');
+                item.style.borderColor = '#10b981';
+            }
+        })
 
     } catch (error) {
         errorWindow.style.display = 'block';
@@ -274,6 +276,7 @@ ulBox.addEventListener('click', async (e) => {
                 updatedCheckList.push(item.childNodes[0].textContent.trim());
             }
         })
+        console.log("Updated List: ", updatedCheckList);
 
         try {
             
