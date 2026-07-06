@@ -196,22 +196,21 @@ async def updateCheckList(
     
     try:
         updatedCheckList = []
-        for item in data.checked_list:
-            todo_item = db.query(model.Todo).filter(
-                model.Todo.title == item,
-                model.Todo.userId == data.id
-            ).first()
+        todo_item = db.query(model.Todo).filter(model.Todo.userId == data.id).first()
             
-            if not todo_item:
-                raise KeyError("Item Not Found")
+        if not todo_item:
+            raise KeyError("Item Not Found")
             
-            if not todo_item.is_complete and todo_item.title:
-                todo_item.is_complete = True
+        for todo in todo_item:
+            if todo.title in data.checked_list:
+                todo.is_complete = True
             else:
-                updateItem = db.query(model.Todo).filter(model.Todo.user_id == data.id).first()
-                for value in updateItem.title:
-                    if value != item and updateItem.is_complete:
-                        updateItem.is_complete = False
+                todo.is_complete = False
+        
+        db.commit()
+        return {
+            "status" : "success"
+        }
     except KeyError:
         
         raise HTTPException(
