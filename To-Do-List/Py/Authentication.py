@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 import model
 import re
 
-userInfo = UsersInfo()
 app = FastAPI()
 model.Base.metadata.create_all(bind=engine)
 
@@ -68,80 +67,158 @@ class CheckedList(BaseModel):
 async def logIn(
     user : UserAuth, 
     db : Annotated[Session, Depends(model.get_db)]):
+    
     result = db.query(model.UserAuthInfo).filter(model.UserAuthInfo.id == user.userId).first()
     if not result:
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
             detail = "User Id Not Found"
         )
-    todolist = [[result.title, result.is_complete] for todo in result.todolist]
-    
+        
+    todolist = [[todo.title, todo.is_complete] for todo in result.todolist]
+    return {
+        "status" : "success",
+        "item-list" : todolist
+    }
 
 
 @app.post("/AddItem")
 async def addItem(
     data : AddItemList, 
     db : Annotated[Session, Depends(model.get_db)]):
-    if not data.item:
-        raise HTTPException(status_code = status.HTTP_406_NOT_ACCEPTABLE)
     
-    if len(userInfo.info[data.id]["To-Do-List"]) >= 50:
-        raise HTTPException(status_code = status.HTTP_403_FORBIDDEN)
+    result = db.query(model.UserAuthInfo).filter(model.UserAuthInfo.id == data.id).first()
+    if not result:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Id Not Found"
+        )
+    items = [todo.title for todo in result.todolist]
     
-    userInfo.info[data.id]["To-Do-List"].append(data.item)
+    if data.item in items:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = "Item Already Exist"
+        )
+        
+    newItemList = model.Todo(
+        title = data.item,
+        user_id = data.id
+    )
+    db.add(newItemList)
+    db.commit()
+    db.refresh()
+    
     return {
         "status" : "success",
-        "updated_list" : userInfo.info[data.id]["To-Do-List"]
+        "updated_list" : [todo.title for todo in result.todolist]
     }
 
 @app.post("/Register")
 async def register(
     data : UserAuth, 
     db : Annotated[Session, Depends(model.get_db)]):
-    if data.userId in userInfo.info:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
-    taken_usernames = userInfo.taken_user
     
-    if data.username in taken_usernames:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
-    userInfo.taken_user.add(data.username)
-    userInfo.info[data.userId] = {
-        "Username" : data.username,
-        "Password" : data.password,
-        "To-Do-List" : [],
-        "Checked-List" : []
-    }
-    return {"status" : "success"}
+    new_user = model.UserAuthInfo(
+        id = data.id,
+        username = data.username,
+        password = data.password
+    )
+    try:
+        
+        db.add(new_user)
+        db.commit()
+        return {"status" : "success"}
+    except:
+        
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = "Username or Id might already created by someone"
+        )
 
 
 @app.put("/DeleteList")
 async def deleteList(
     data : UpdateList, 
     db : Annotated[Session, Depends(model.get_db)]):
-    if data.id in userInfo.info:
-        updatedList = data.todo_list
-        userInfo.deleted_List.append(data.deleted_list)
-        userInfo.info[data.id]["To-Do-List"] = updatedList
-        todoList = userInfo.info[data.id]["To-Do-List"]
+    
+    result = db.query(model.UserAuthInfo).filter(model.UserAuthInfo.id == data.id).first()
+    if not result:
+        raise HTTPException(
+            status_code = status.HTTP_403_FORBIDDEN,
+            detail = "ID Does Not Exist"
+        )
+    
+    try:
+        
+        delete_item = model.Todo(
+            id = data.id,
+            title = data.item
+        )
+        
+        if not delete_item:
+            raise KeyError("Item Not Found")
+        
+        db.deleted(delete_item)
+        db.commit()
+        
+        updatedItem = [ todo.title for todo in result.todolist ]
+        
         return {
-            "status" : "succes",
-            "deleted-list" : userInfo.deleted_List,
-            "updated-list" : todoList
+            "status" : "success",
+            "updated-item" : updatedItem
         }
-
+    except KeyError:
+        
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Item does not exist in your list"
+        )
+    except Exception as e:
+        
+        raise HTTPException(
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail = "An Internal database error occured"
+        )
 
 
 @app.put("/UpdateChecked")
 async def updateCheckList(
     data : CheckedList, 
     db : Annotated[Session, Depends(model.get_db)]):
-    if data.id in userInfo.info:
-        userInfo.info[data.id]["Checked-List"] = data.checked_list
-        return {
-            "status" : "success",
-            "updated-checked-list" : userInfo.info[data.id]["Checked-List"]
-        }
-    raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
+    
+    result = db.query(model.UserAuthInfo).filter(model.UserAuthInfo.id == data.id).first()
+    if not result:
+        raise HTTPException(
+            status_code = status.HTTP_401_UNAUTHORIZED,
+            detail = "Id Does Not Exist"
+        )
+    
+    try:
+        updatedCheckList = []
+        for item in data.checked_list:
+            todo_item = db.query(model.Todo).filter(
+                model.Todo.title == item,
+                model.Todo.userId == data.id
+            )
+            
+            if not todo_item:
+                raise KeyError("Item Not Found")
+            
+            if todo_item.is_complete == False:
+                pass
+    except KeyError:
+        
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Item Or Id Not Found"
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail = "An internal database error occurred"
+        )
 
 
 
@@ -149,12 +226,6 @@ async def updateCheckList(
 async def getListItems(
     id : Annotated[int, Field(ge = 99, le = 100000000000)], 
     db : Annotated[Session, Depends(model.get_db)]):
-    if id in userInfo.info:
-        return {
-            "status" : "succes",
-            "item-list" : userInfo.info[id]["To-Do-List"],
-            "checked-item" : userInfo.info[id]["Checked-List"]
-        }
-    raise HTTPException(status_code = status.HTTP_403_FORBIDDEN)
+    pass
 
 
