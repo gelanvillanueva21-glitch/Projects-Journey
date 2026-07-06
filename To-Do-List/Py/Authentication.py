@@ -1,12 +1,15 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 from typing import Annotated
-from database import UsersInfo
+from database import engine
+from sqlalchemy.orm import Session
+import model
 import re
 
 userInfo = UsersInfo()
 app = FastAPI()
+model.Base.metadata.create_all(bind=engine)
 
 
 # This allow us to connect our local backend and local frontend
@@ -62,23 +65,23 @@ class CheckedList(BaseModel):
 
 
 @app.post("/Login")
-async def logIn(user : UserAuth):
-    if user.userId in userInfo.info:
-        db_user = userInfo.info[user.userId]
-        tempId = user.userId
-        if user.username == db_user.get("Username") and user.password == db_user.get("Password"):
-            return {
-                "status" : "success",
-                "todo_list" : db_user.get("To-Do-List", []),
-                "checked_list" : db_user.get("Checked-List", [])
-            }
-        raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED)
-    else:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
+async def logIn(
+    user : UserAuth, 
+    db : Annotated[Session, Depends(model.get_db)]):
+    result = db.query(model.UserAuthInfo).filter(model.UserAuthInfo.id == user.userId).first()
+    if not result:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "User Id Not Found"
+        )
+    todolist = [[result.title, result.is_complete] for todo in result.todolist]
+    
 
 
 @app.post("/AddItem")
-async def addItem(data : AddItemList):
+async def addItem(
+    data : AddItemList, 
+    db : Annotated[Session, Depends(model.get_db)]):
     if not data.item:
         raise HTTPException(status_code = status.HTTP_406_NOT_ACCEPTABLE)
     
@@ -92,7 +95,9 @@ async def addItem(data : AddItemList):
     }
 
 @app.post("/Register")
-async def register(data : UserAuth):
+async def register(
+    data : UserAuth, 
+    db : Annotated[Session, Depends(model.get_db)]):
     if data.userId in userInfo.info:
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
     taken_usernames = userInfo.taken_user
@@ -110,7 +115,9 @@ async def register(data : UserAuth):
 
 
 @app.put("/DeleteList")
-async def deleteList(data : UpdateList):
+async def deleteList(
+    data : UpdateList, 
+    db : Annotated[Session, Depends(model.get_db)]):
     if data.id in userInfo.info:
         updatedList = data.todo_list
         userInfo.deleted_List.append(data.deleted_list)
@@ -125,7 +132,9 @@ async def deleteList(data : UpdateList):
 
 
 @app.put("/UpdateChecked")
-async def updateCheckList(data : CheckedList):
+async def updateCheckList(
+    data : CheckedList, 
+    db : Annotated[Session, Depends(model.get_db)]):
     if data.id in userInfo.info:
         userInfo.info[data.id]["Checked-List"] = data.checked_list
         return {
@@ -137,7 +146,9 @@ async def updateCheckList(data : CheckedList):
 
 
 @app.get("/GetItems")
-async def getListItems(id : Annotated[int, Field(ge = 99, le = 100000000000)]):
+async def getListItems(
+    id : Annotated[int, Field(ge = 99, le = 100000000000)], 
+    db : Annotated[Session, Depends(model.get_db)]):
     if id in userInfo.info:
         return {
             "status" : "succes",

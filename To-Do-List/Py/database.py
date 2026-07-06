@@ -1,19 +1,16 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
-class UsersInfo():
-    def __init__(self):
-        self.info = {
-            1000 : {
-                "Username" : "gelanMar",
-                "Password" : "Mypassis123pizz@",
-                "To-Do-List" : [
-                    "Buy some groceries",
-                    "Train calisthenics"
-                ],
-                "Checked-List" : [
-                    "Buy some groceries"
-                ]
-            }
-        }
-        self.taken_user = set()
-        self.deleted_List = []
-        
+DATABASE_URL = "sqlite///./users_info.db"
+
+engine = create_engine(
+    DATABASE_URL,
+    connect_args = {"check_same_thread" : False}
+    )
+
+SessionLocal = sessionmaker(
+    autocommit = False,
+    autoflush = False,
+    bind = engine
+)
+Base = declarative_base()
