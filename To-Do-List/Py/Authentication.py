@@ -205,7 +205,9 @@ async def updateCheckList(
             if not todo_item:
                 raise KeyError("Item Not Found")
             
-            if todo_item.is_complete == False:
+            if not todo_item.is_complete and todo_item.title:
+                todo_item.is_complete = True
+            else:
                 pass
     except KeyError:
         
