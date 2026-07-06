@@ -200,7 +200,7 @@ async def updateCheckList(
             todo_item = db.query(model.Todo).filter(
                 model.Todo.title == item,
                 model.Todo.userId == data.id
-            )
+            ).first()
             
             if not todo_item:
                 raise KeyError("Item Not Found")
@@ -208,7 +208,10 @@ async def updateCheckList(
             if not todo_item.is_complete and todo_item.title:
                 todo_item.is_complete = True
             else:
-                pass
+                updateItem = db.query(model.Todo).filter(model.Todo.user_id == data.id).first()
+                for value in updateItem.title:
+                    if value != item and updateItem.is_complete:
+                        updateItem.is_complete = False
     except KeyError:
         
         raise HTTPException(
