@@ -68,11 +68,15 @@ async def logIn(
     user : UserAuth, 
     db : Annotated[Session, Depends(model.get_db)]):
     
-    result = db.query(model.UserAuthInfo).filter(model.UserAuthInfo.id == user.userId).first()
+    result = db.query(model.UserAuthInfo).filter(
+        model.UserAuthInfo.id == user.userId,
+        model.UserAuthInfo.username == user.username,
+        model.UserAuthInfo.password == user.password
+        ).first()
     if not result:
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
-            detail = "User Id Not Found"
+            detail = "Id or Username or Password Not Found"
         )
         
     todolist = [[todo.title, todo.is_complete] for todo in result.todolist]
@@ -107,7 +111,7 @@ async def addItem(
     )
     db.add(newItemList)
     db.commit()
-    db.refresh()
+    db.refresh(newItemList)
     
     return {
         "status" : "success",
@@ -120,7 +124,7 @@ async def register(
     db : Annotated[Session, Depends(model.get_db)]):
     
     new_user = model.UserAuthInfo(
-        id = data.id,
+        id = data.userId,
         username = data.username,
         password = data.password
     )
@@ -151,15 +155,15 @@ async def deleteList(
     
     try:
         
-        delete_item = model.Todo(
-            id = data.id,
-            title = data.item
-        )
+        target_item = db.query(model.Todo).filter(
+            model.Todo.title == data.deleted_list,
+            model.Todo.user_id == data.id
+        ).first()
         
-        if not delete_item:
+        if not target_item:
             raise KeyError("Item Not Found")
         
-        db.deleted(delete_item)
+        db.delete(target_item)
         db.commit()
         
         updatedItem = [ todo.title for todo in result.todolist ]
@@ -175,7 +179,7 @@ async def deleteList(
             detail = "Item does not exist in your list"
         )
     except Exception as e:
-        
+        db.rollback()
         raise HTTPException(
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail = "An Internal database error occured"
@@ -195,8 +199,8 @@ async def updateCheckList(
         )
     
     try:
-        updatedCheckList = []
-        todo_item = db.query(model.Todo).filter(model.Todo.userId == data.id).first()
+
+        todo_item = db.query(model.Todo).filter(model.Todo.user_id == data.id).all()
             
         if not todo_item:
             raise KeyError("Item Not Found")
@@ -208,8 +212,10 @@ async def updateCheckList(
                 todo.is_complete = False
         
         db.commit()
+        todo_update = [ [todo.title, todo.is_complete] for todo in result.todolist ]
         return {
-            "status" : "success"
+            "status" : "success",
+            "update-list" : todo_update
         }
     except KeyError:
         
@@ -230,6 +236,18 @@ async def updateCheckList(
 async def getListItems(
     id : Annotated[int, Field(ge = 99, le = 100000000000)], 
     db : Annotated[Session, Depends(model.get_db)]):
-    pass
+    
+    result = db.query(model.UserAuthInfo).filter(model.UserAuthInfo.id == id).first()
+    if not result:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Id Not Found"
+        )
+    
+    todolist = [[todo.title, todo.is_complete] for todo in result.todolist]
+    return {
+        "status" : "succes",
+        "Todo-List" : todolist
+    }
 
 
