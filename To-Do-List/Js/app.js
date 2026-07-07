@@ -8,9 +8,9 @@ const confirmNo = document.querySelector('.delete-confirm-no');
 const confirmYes = document.querySelector('.delete-confirm-yes');
 
 const checkBox = document.getElementById('show-password-checkbox');
-const id = document.getElementById('id');
+const id = document.getElementById('userid');
 const username = document.getElementById('username');
-const password = document.getElementById('pass-word');
+const password = document.getElementById('password');
 const logInBtn = document.getElementById('log-in');
 
 const errorWindow = document.querySelector('.error-popup');
@@ -56,8 +56,10 @@ window.addEventListener('DOMContentLoaded', async () => {
                 let btn = document.createElement('button');
                 btn.classList.add('trash-btn');
                 btn.type = 'button';
+                btn.ariaLabel = "Delte item";
                 let img = document.createElement('img');
                 img.src = '../Images/trash.svg';
+                img.alt = "Trash Icon";
                 img.classList.add('image');
                 btn.appendChild(img);
                 li.innerText = list[0]
@@ -136,8 +138,10 @@ logInBtn.addEventListener('click', async function() {
                     let btn = document.createElement('button');
                     btn.classList.add('trash-btn');
                     btn.type = 'button';
+                    btn.ariaLabel = "Delte item";
                     let img = document.createElement('img');
                     img.src = '../Images/trash.svg';
+                    img.alt = "Trash Icon";
                     img.classList.add('image');
                     btn.appendChild(img);
                     li.innerText = list[0]
@@ -185,8 +189,10 @@ addButton.addEventListener('click', async () => {
             let btn = document.createElement('button');
             btn.classList.add('trash-btn');
             btn.type = 'button';
+            btn.ariaLabel = "Delte item";
             let img = document.createElement('img');
             img.src = '../Images/trash.svg';
+            img.alt = "Trash Icon";
             btn.appendChild(img);
             img.classList.add('image');
             li.innerText = addInputList.value;
@@ -215,7 +221,7 @@ addButton.addEventListener('click', async () => {
                     notiWindow.style.display = 'block';
                 }
             } catch (error) {
-                errorWindow.style.display = 'none';
+                errorWindow.style.display = 'block';
             }
         }
     }
@@ -223,11 +229,11 @@ addButton.addEventListener('click', async () => {
 
 window.addEventListener('click', (e) => {
 
-    if (event.target.classList.contains('popup-notification')) {
+    if (e.target.classList.contains('popup-notification')) {
         notiWindow.style.display = 'none';
     }
 
-    if (event.target.classList.contains('duplicate-popup')) {
+    if (e.target.classList.contains('duplicate-popup')) {
         alreadyExistWindow.style.display = 'none';
     }
 
@@ -256,6 +262,7 @@ ulBox.addEventListener('click', async (e) => {
         deleteConfirmWindow.style.display = 'block';
     }
     if (!trashBtn) {
+        e.preventDefault();
         const allList = document.querySelectorAll('.list-box ul li.list');
         let updatedCheckList = [];
         e.target.classList.toggle('completed');
@@ -311,14 +318,15 @@ confirmYes.addEventListener('click', async () => {
         });
 
         if (!result.ok) {
-          console.log(elementPending)
-          deleteConfirmWindow.style.display = 'none';
+            console.log(elementPending)
+            deleteConfirmWindow.style.display = 'none';
             throw new Error("Error Occurred During Fetching Data");
         }
 
-        let data = await result.json()
+        let listBox = document.querySelector('.list-box ul');
+        let data = await result.json();
         deleteConfirmWindow.style.display = 'none';
-
+        listBox.innerHTML = '';
         data["Todo-List"].forEach((item) => {
 
             let li = document.createElement('li');
@@ -326,8 +334,10 @@ confirmYes.addEventListener('click', async () => {
             let btn = document.createElement('button');
             btn.classList.add('trash-btn');
             btn.type = 'button';
+            btn.ariaLabel = "Delte item";
             let img = document.createElement('img');
             img.src = '../Images/trash.svg';
+            img.alt = "Trash Icon";
             btn.appendChild(img);
             img.classList.add('image');
             li.innerText = item[0]

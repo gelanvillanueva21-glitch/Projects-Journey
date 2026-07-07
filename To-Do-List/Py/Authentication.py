@@ -58,7 +58,7 @@ class AddItemList(BaseModel):
 
 
 class CheckedList(BaseModel):
-    checked_list : list[str] = [],
+    checked_list : list[str] = []
     id : int
 
 
@@ -133,7 +133,7 @@ async def register(
         db.commit()
         return {"status" : "success"}
     except:
-        
+        db.rollback()
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
             detail = "Username or Id might already created by someone"

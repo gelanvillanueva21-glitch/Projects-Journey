@@ -76,7 +76,7 @@ createAccBtn.addEventListener('click', async () => {
         succesWindow.style.display = 'block';
 
     } catch (error) {
-        errorP.innerText = error;
+        errorP.innerText = error.message;
         errorPopup.style.display = 'block';
     }
 })

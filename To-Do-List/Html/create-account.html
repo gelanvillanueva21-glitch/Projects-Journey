@@ -12,7 +12,7 @@
     </head>
     <body>
         <div class="container">
-
+            <main>
             <div class="account-exists-popup">
                 <div class="account-exists-content">
                     <button class="account-exists-close" type="button">X</button>
@@ -73,12 +73,12 @@
                         <input type="text" id="create-id" placeholder="12345">
                     </div>
                     <div class="input-group">
-                        <label for="create-username" autocomplete="username">Username</label>
-                        <input type="text" id="create-username" placeholder="gelan123Mar">
+                        <label for="create-username">Username</label>
+                        <input type="text" id="create-username" placeholder="gelan123Mar" autocomplete="username">
                     </div>
                     <div class="input-group">
-                        <label for="create-password" autocomplete="new-password">Password</label>
-                        <input type="password" id="create-password" placeholder="Gelan1gw@po">
+                        <label for="create-password">Password</label>
+                        <input type="password" id="create-password" placeholder="Gelan1gw@po" autocomplete="new-password">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="create-show-password-checkbox">
@@ -90,6 +90,7 @@
                     </div>
                 </div>
             </div>
+            </main>
         </div>
 
         <script src="../Js/create-account.js"></script>
