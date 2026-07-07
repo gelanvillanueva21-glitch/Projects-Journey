@@ -299,34 +299,6 @@ confirmNo.addEventListener('click', () => {
 })
 
 confirmYes.addEventListener('click', async () => {
-    const allList = document.querySelectorAll('.list-box ul li.list');
-    const listBox = document.querySelector('.list-box ul');
-    const updatedList = []
-    allList.forEach((item) => {
-        if (elementPending !== item.childNodes[0].textContent.trim()) {
-            let cleanItem = item.childNodes[0].textContent.trim();
-            updatedList.push(cleanItem);
-        }
-    })
-    listBox.innerHTML = '';
-    if (updatedList.length === 0) { return }
-
-    updatedList.forEach((item) => {
-        let li = document.createElement('li');
-        li.classList.add('list');
-        let btn = document.createElement('button');
-        btn.classList.add('trash-btn');
-        btn.type = 'button';
-        let img = document.createElement('img');
-        img.src = '../Images/trash.svg';
-        btn.appendChild(img);
-        img.classList.add('image');
-        li.innerText = item
-        li.appendChild(btn)
-        listBox.appendChild(li);
-    })
-
-
     try {
         
         let result = await fetch('http://127.0.0.1:8000/DeleteList', {
@@ -341,7 +313,31 @@ confirmYes.addEventListener('click', async () => {
         if (!result.ok) {
             throw new Error("Error Occurred During Fetching Data");
         }
+
+        let data = await result.json()
         deleteConfirmWindow.style.display = 'none';
+
+        data["Todo-List"].forEach((item) => {
+
+            let li = document.createElement('li');
+            li.classList.add('list');
+            let btn = document.createElement('button');
+            btn.classList.add('trash-btn');
+            btn.type = 'button';
+            let img = document.createElement('img');
+            img.src = '../Images/trash.svg';
+            btn.appendChild(img);
+            img.classList.add('image');
+            li.innerText = item[0]
+            li.appendChild(btn)
+
+            if (item[1]) {
+                li.classList.add('completed');
+                li.style.borderColor = '#10b981'
+            }
+            listBox.appendChild(li);
+
+        })
 
     } catch (error) {
         errorWindow.style.display = 'block';

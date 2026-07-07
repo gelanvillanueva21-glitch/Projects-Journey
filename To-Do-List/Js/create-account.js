@@ -5,7 +5,7 @@ const emptyInputWindow = document.querySelector('.empty-fields-popup');
 const emptyWindowCloseBtn = document.querySelector('.empty-close');
 const emptyWindowTryAgainBtn = document.querySelector('.empty-fields-try-again');
 const errorPopup = document.querySelector('.error-occurred-popup');
-const errorCloseBtn = document.querySelector('.error-occurred-close');
+const errorCloseBtn2 = document.querySelector('.error-occurred-close');
 const errorTryAgainBtn = document.querySelector('.error-occurred-retry');
 const alreadyExistBtn = document.querySelector('.account-exists-content');
 const successContinueBtn = document.querySelector('.account-success-continue');
@@ -99,8 +99,8 @@ successBtn.addEventListener('click', () => {
 })
 
 successContinueBtn.addEventListener('click', () => {
-    succesWindow.style.display = 'none';
     window.location.href = 'index.html';
+    succesWindow.style.display = 'none';
 })
 
 

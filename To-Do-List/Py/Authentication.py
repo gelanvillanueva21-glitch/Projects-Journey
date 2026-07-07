@@ -165,7 +165,7 @@ async def deleteList(
         db.delete(target_item)
         db.commit()
         
-        updatedItem = [ todo.title for todo in result.todolist ]
+        updatedItem = [ [todo.title, todo.is_complete] for todo in result.todolist ]
         
         return {
             "status" : "success",
