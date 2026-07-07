@@ -146,6 +146,7 @@
         top: auto;
         left: auto;
         transform: none;
+        animation: mobilePopupIn 0.25s ease-out;
     }
     
     /* TO DO LIST */

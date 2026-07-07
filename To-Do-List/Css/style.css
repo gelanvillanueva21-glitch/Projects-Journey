@@ -1339,3 +1339,15 @@ body {
 .delete-confirm-yes:active {
     transform: translateY(1px);
 }
+
+@keyframes mobilePopupIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

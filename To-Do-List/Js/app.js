@@ -248,7 +248,7 @@ const ulBox = document.querySelector('.list-box ul');
 
 ulBox.addEventListener('click', async (e) => {
 
-    const trashBtn = e.target.closest('.trash-btn');
+    const trashBtn = e.target.closest('.trash-btn')
 
     if (trashBtn) {
         let parentTrashBtn = trashBtn.parentElement;
@@ -311,6 +311,8 @@ confirmYes.addEventListener('click', async () => {
         });
 
         if (!result.ok) {
+          console.log(elementPending)
+          deleteConfirmWindow.style.display = 'none';
             throw new Error("Error Occurred During Fetching Data");
         }
 
