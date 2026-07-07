@@ -14,52 +14,52 @@
 
             <div class="account-exists-popup">
                 <div class="account-exists-content">
-                    <button class="account-exists-close">X</button>
+                    <button class="account-exists-close" type="button">X</button>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--color-indigo-primary)">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
                     </svg>
                     <h3>Account Already Exists!</h3>
                     <p>ID, username, or password already exists. Please use different values.</p>
-                    <button class="account-exists-try-again">Try Again</button>
+                    <button class="account-exists-try-again" type="button">Try Again</button>
                 </div>
             </div>
 
             <div class="account-success-popup">
                 <div class="account-success-content">
-                    <button class="account-success-close">X</button>
+                    <button class="account-success-close" type="button">X</button>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--color-white)">
                         <circle cx="12" cy="12" r="10"/>
                         <path fill="var(--color-indigo-main)" d="M9.16 16.04l-4.58-4.58 1.64-1.64 2.94 2.94 6.94-6.94 1.64 1.64-8.58 8.58z"/>
                     </svg>
                     <h3>Account Created Successfully!</h3>
                     <p>Your account has been created. You can now sign in.</p>
-                    <button class="account-success-continue">Continue</button>
+                    <button class="account-success-continue" type="button">Continue</button>
                 </div>
             </div>
 
             <div class="error-occurred-popup">
                 <div class="error-occurred-content">
-                    <button class="error-occurred-close">X</button>
+                    <button class="error-occurred-close" type="button">X</button>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10" fill="var(--color-indigo-primary)"/>
                         <path fill="var(--color-white)" d="M11 7h2v2h-2zm0 4h2v6h-2z"/>
                     </svg>
                     <h3>Error Occurred!</h3>
                     <p id = "error-paragraph">Something went wrong. Please try again later.</p>
-                    <button class="error-occurred-retry">Try Again</button>
+                    <button class="error-occurred-retry" type="button">Try Again</button>
                 </div>
             </div>
 
             <div class="empty-fields-popup">
                 <div class="empty-fields-content">
-                    <button class="empty-close">X</button>
+                    <button class="empty-close" type="button">X</button>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10" fill="var(--color-indigo-primary)"/>
                         <path fill="var(--color-white)" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/>
                     </svg>
                     <h3>Empty Fields!</h3>
                     <p>Please create your ID, username, and password. All fields are required.</p>
-                    <button class="empty-fields-try-again">Try Again</button>
+                    <button class="empty-fields-try-again" type="button">Try Again</button>
                 </div>
             </div>
 
@@ -72,18 +72,18 @@
                         <input type="text" id="create-id" placeholder="12345">
                     </div>
                     <div class="input-group">
-                        <label for="create-username">Username</label>
+                        <label for="create-username" autocomplete="username">Username</label>
                         <input type="text" id="create-username" placeholder="gelan123Mar">
                     </div>
                     <div class="input-group">
-                        <label for="create-password">Password</label>
+                        <label for="create-password" autocomplete="new-password">Password</label>
                         <input type="password" id="create-password" placeholder="Gelan1gw@po">
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="create-show-password-checkbox">
                         <label for="create-show-password-checkbox">Show password</label>
                     </div>
-                    <button id="create-account-btn">Create Account</button>
+                    <button id="create-account-btn" type="button">Create Account</button>
                     <div class="auth-footer">
                         <span>Already have an account? <a href="index.html">Sign In</a></span>
                     </div>

@@ -49,7 +49,6 @@ class UserAuth(BaseModel):
         return value
 
 class UpdateList(BaseModel):
-    todo_list : Annotated[list[str], Field(default_factory = list)]
     deleted_list : str
     id : int
 
@@ -82,7 +81,7 @@ async def logIn(
     todolist = [[todo.title, todo.is_complete] for todo in result.todolist]
     return {
         "status" : "success",
-        "item-list" : todolist
+        "Todo-List" : todolist
     }
 
 
@@ -141,7 +140,7 @@ async def register(
         )
 
 
-@app.put("/DeleteList")
+@app.delete("/DeleteList")
 async def deleteList(
     data : UpdateList, 
     db : Annotated[Session, Depends(model.get_db)]):

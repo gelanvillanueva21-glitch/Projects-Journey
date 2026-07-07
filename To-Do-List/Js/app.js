@@ -10,7 +10,7 @@ const confirmYes = document.querySelector('.delete-confirm-yes');
 const checkBox = document.getElementById('show-password-checkbox');
 const id = document.getElementById('id');
 const username = document.getElementById('username');
-const password = document.getElementById('password');
+const password = document.getElementById('pass-word');
 const logInBtn = document.getElementById('log-in');
 
 const errorWindow = document.querySelector('.error-popup');
@@ -34,6 +34,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     const savedId = localStorage.getItem('id');
     if (!savedId) { return }
     globalId = Number(savedId);
+    console.log(globalId);
+    
 
     try {
 
@@ -44,37 +46,31 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
         windowSignIn.style.display = 'none';
         let data = await result.json();
-        let itemList = data["item-list"];
-        let checkedList = data["checked-item"];
-        console.log("Item List: " ,itemList);
-        console.log("Check List :" , checkedList);
+        let itemList = data["Todo-List"];
 
         if (itemList.length !== 0) {
             itemList.forEach((list) => {
+                console.log(list);
                 let li = document.createElement('li');
                 li.classList.add('list');
                 let btn = document.createElement('button');
                 btn.classList.add('trash-btn');
+                btn.type = 'button';
                 let img = document.createElement('img');
                 img.src = '../Images/trash.svg';
                 img.classList.add('image');
                 btn.appendChild(img);
-                li.innerText = list
+                li.innerText = list[0]
                 li.appendChild(btn);
+
+                if (list[1]) {
+                    li.classList.add('completed');
+                    li.style.borderColor = '#10b981';
+                }
+
                 toDoList.appendChild(li);
             })
         }
-
-        if (checkedList.length === 0) { return }
-            let allNotes = document.querySelectorAll('.list-box ul li.list');
-            allNotes.forEach((item) => {
-            tempItem = item.childNodes[0].textContent.trim();
-            if (checkedList.includes(tempItem)) {
-                item.classList.add('completed');
-                item.style.borderColor = '#10b981';
-            }
-        })
-
     } catch (error) {
         errorWindow.style.display = 'block';
     }
@@ -126,37 +122,35 @@ logInBtn.addEventListener('click', async function() {
         }
 
         const data = await result.json();
-        if (data['status']) {
+        if (data["status"]) {
             windowSignIn.style.display = 'none';
-            let userList = data['todo_list'];
-            let checkedList = data['checked_list'];
-            localStorage.setItem('id' , tempUserId);
+            localStorage.setItem('id', tempUserId)
             globalId = tempUserId
-            if (userList.length === 0) { return }
-            
-            userList.forEach((list) => {
-                let li = document.createElement('li');
-                li.classList.add('list');
-                let btn = document.createElement('button');
-                btn.classList.add('trash-btn');
-                let img = document.createElement('img');
-                img.src = '../Images/trash.svg';
-                btn.appendChild(img);
-                img.classList.add('image');
-                li.innerText = list;
-                li.appendChild(btn);
-                toDoList.appendChild(li);
-            })
+            let itemList = data["Todo-List"];
 
-            if (checkedList.length === 0) { return }
-            let allNotes = document.querySelectorAll('.list-box ul li.list');
-            allNotes.forEach((item) => {
-                tempItem = item.childNodes[0].textContent.trim();
-                if (checkedList.includes(tempItem)) {
-                    item.classList.add('completed');
-                    item.style.borderColor = '#10b981';
-                }
-            })
+            if (itemList.length !== 0) {
+                itemList.forEach((list) => {
+                    console.log(list);
+                    let li = document.createElement('li');
+                    li.classList.add('list');
+                    let btn = document.createElement('button');
+                    btn.classList.add('trash-btn');
+                    btn.type = 'button';
+                    let img = document.createElement('img');
+                    img.src = '../Images/trash.svg';
+                    img.classList.add('image');
+                    btn.appendChild(img);
+                    li.innerText = list[0]
+                    li.appendChild(btn);
+
+                    if (list[1]) {
+                        li.classList.add('completed');
+                        li.style.borderColor = '#10b981';
+                    }
+
+                    toDoList.appendChild(li);
+                })
+            }
         }
         
     } catch (error) {
@@ -190,6 +184,7 @@ addButton.addEventListener('click', async () => {
             li.classList.add('list');
             let btn = document.createElement('button');
             btn.classList.add('trash-btn');
+            btn.type = 'button';
             let img = document.createElement('img');
             img.src = '../Images/trash.svg';
             btn.appendChild(img);
@@ -321,6 +316,7 @@ confirmYes.addEventListener('click', async () => {
         li.classList.add('list');
         let btn = document.createElement('button');
         btn.classList.add('trash-btn');
+        btn.type = 'button';
         let img = document.createElement('img');
         img.src = '../Images/trash.svg';
         btn.appendChild(img);
@@ -334,10 +330,9 @@ confirmYes.addEventListener('click', async () => {
     try {
         
         let result = await fetch('http://127.0.0.1:8000/DeleteList', {
-            method : 'PUT',
+            method : 'DELETE',
             headers : {'Content-Type' : 'application/json'},
             body : JSON.stringify({
-                todo_list : updatedList,
                 deleted_list : elementPending,
                 id : globalId
             })
@@ -346,13 +341,9 @@ confirmYes.addEventListener('click', async () => {
         if (!result.ok) {
             throw new Error("Error Occurred During Fetching Data");
         }
-        let data = await result
         deleteConfirmWindow.style.display = 'none';
 
     } catch (error) {
         errorWindow.style.display = 'block';
     }
-
-
-    deleteConfirmWindow.style.display = 'none'
 })
