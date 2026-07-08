@@ -357,3 +357,8 @@ confirmYes.addEventListener('click', async () => {
         errorWindow.style.display = 'block';
     }
 })
+
+
+if (performance.getEntriesByType("navigation")[0].type !== "reload") {
+    localStorage.clear()
+}

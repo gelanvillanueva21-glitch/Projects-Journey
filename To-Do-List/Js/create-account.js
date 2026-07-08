@@ -99,7 +99,7 @@ successBtn.addEventListener('click', () => {
 })
 
 successContinueBtn.addEventListener('click', () => {
-    window.location.href = 'index.html';
+    window.location.href = '../Html/index.html';
     succesWindow.style.display = 'none';
 })
 
