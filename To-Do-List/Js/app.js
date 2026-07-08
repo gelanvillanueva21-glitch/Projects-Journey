@@ -318,6 +318,8 @@ confirmYes.addEventListener('click', async () => {
         });
 
         if (!result.ok) {
+            let data = await result.json();
+            console.log(data["updated-item"])
             console.log(elementPending)
             deleteConfirmWindow.style.display = 'none';
             throw new Error("Error Occurred During Fetching Data");
@@ -327,7 +329,7 @@ confirmYes.addEventListener('click', async () => {
         let data = await result.json();
         deleteConfirmWindow.style.display = 'none';
         listBox.innerHTML = '';
-        data["Todo-List"].forEach((item) => {
+        data["updated-item"].forEach((item) => {
 
             let li = document.createElement('li');
             li.classList.add('list');
