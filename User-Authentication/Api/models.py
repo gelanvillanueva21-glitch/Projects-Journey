@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, ForeingKey
+from sqlalchemy import String, ForeignKey
 from database import Base
 
 
@@ -9,7 +9,7 @@ class User(Base):
     id : Mapped[int] = mapped_column(primary_key = True)
     email : Mapped[str] = mapped_column(
         String(255), 
-        primary_key = True, 
+        unique = True, 
         index = True)
     hashed_password : Mapped[str] = mapped_column(String(255))
     is_active : Mapped[bool] = mapped_column(default = True)
@@ -24,7 +24,7 @@ class Task(Base):
     title : Mapped[str] = mapped_column(String(255))
     description : Mapped[str | None] = mapped_column(String(255))
     is_done : Mapped[bool] = mapped_column(default = False)
-    user_id : Mapped[int] = mapped_column(ForeingKey("users.id"))
+    user_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     
     user : Mapped["User"] = relationship(back_populates = "tasks")
 
