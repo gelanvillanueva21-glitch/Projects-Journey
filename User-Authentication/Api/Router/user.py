@@ -4,6 +4,8 @@ from typing import Annotated
 from database import get_database
 from schemas import UserCreate, UserResponse
 from crud import get_user_email, create_user
+from authentication import get_user
+from ..models import User
 
 
 router = APIRouter(
@@ -33,8 +35,9 @@ async def register(
 
 
 @router.get("/", response_model = UserResponse)
-async def read_user():
-    pass
+async def read_user(
+    current_user : Annotated[User, Depends(get_user)]):
+        return current_user
 
 
 
