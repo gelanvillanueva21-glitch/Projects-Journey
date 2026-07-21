@@ -18,6 +18,7 @@ async def create_user(
         hashed_pass = hash_password(user.password)
         data_user = User(email=user.email, password = hashed_pass)
         database.add(data_user)
+        print(data_user)
         await database.commit()
         await database.refresh()
         return data_user

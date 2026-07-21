@@ -4,11 +4,11 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt, JWTError
-from ..database import get_database
-from ..schemas import Token
-from ..crud import get_user_email
-from ..auth import verify_pass, create_jwt
-from ..config import setting
+from database import get_database
+from schemas import Token
+from crud import get_user_email
+from auth import verify_pass, create_jwt
+from config import setting
 
 router = APIRouter(
     prefix = "/Auth",

@@ -4,8 +4,8 @@ from typing import Annotated
 from database import get_database
 from schemas import UserCreate, UserResponse
 from crud import get_user_email, create_user
-from authentication import get_user
-from ..models import User
+from Router.authentication import get_user
+from models import User
 
 
 router = APIRouter(
@@ -18,16 +18,21 @@ router = APIRouter(
 async def register(
     user : UserCreate,
     database : Annotated[AsyncSession, Depends(get_database)]):
-        email_exist = await get_user_email(database, user.email)
         try:
+            email_exist = await get_user_email(database, user.email)
             if email_exist:
+                print("Sayonara")
                 raise HTTPException(
                     status_code = status.HTTP_400_BAD_REQUEST,
-                    detail = "Emainl already Registered"
+                    detail = "Email already Registered"
                 )
-            return await create_user(database, user)
+            print("Hello World")
+            result = await create_user(database, user)
+            print(result)
+            return result
         except Exception as e:
-            database.rollback()
+            print(email_exist)
+            await database.rollback()
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
                 detail = "Email already Registered"
