@@ -23,7 +23,6 @@ async def login(
     form_data : Annotated[OAuth2PasswordRequestForm, Depends()],
     database : Annotated[AsyncSession, Depends(get_database)]):
         user = await get_user_email(database, form_data.username)
-        
         if not user or not verify_pass(form_data.password, user.hashed_password):
             raise HTTPException(
                 status_code = status.HTTP_401_UNAUTHORIZED,
@@ -36,9 +35,8 @@ async def login(
         )
         
         return {
-            "status" : "success",
-            "access-token" : access_token,
-            "token-type" : "bearer"
+            "access_token" : access_token,
+            "token_type" : "bearer"
         }
 
 

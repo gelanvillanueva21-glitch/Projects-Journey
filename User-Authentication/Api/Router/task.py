@@ -25,7 +25,7 @@ async def read_tasks(
     "/create-tasks", 
     response_model = TaskResponse,
     status_code = status.HTTP_201_CREATED)
-async def create_task(
+async def create_user_task(
     task : TaskCreate,
     database : Annotated[AsyncSession, Depends(get_database)],
     current_user : Annotated[User, Depends(get_user)]):

@@ -16,11 +16,11 @@ async def create_user(
     database : AsyncSession,
     user : UserCreate) -> User:
         hashed_pass = hash_password(user.password)
-        data_user = User(email=user.email, password = hashed_pass)
+        data_user = User(email=user.email, hashed_password = hashed_pass)
         database.add(data_user)
         print(data_user)
         await database.commit()
-        await database.refresh()
+        await database.refresh(data_user)
         return data_user
 
 
@@ -43,6 +43,6 @@ async def create_task(
         )
         database.add(data_task)
         await database.commit()
-        await database.refresh()
+        await database.refresh(data_task)
         return data_task
 

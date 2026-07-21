@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 from typing import Annotated
 from database import get_database
 from schemas import UserCreate, UserResponse
@@ -14,23 +15,20 @@ router = APIRouter(
 )
 
 
-@router.post("/register", status_code = status.HTTP_201_CREATED)
+@router.post("/register",response_model = UserResponse, status_code = status.HTTP_201_CREATED)
 async def register(
     user : UserCreate,
     database : Annotated[AsyncSession, Depends(get_database)]):
         try:
             email_exist = await get_user_email(database, user.email)
             if email_exist:
-                print("Sayonara")
                 raise HTTPException(
                     status_code = status.HTTP_400_BAD_REQUEST,
                     detail = "Email already Registered"
                 )
-            print("Hello World")
             result = await create_user(database, user)
-            print(result)
             return result
-        except Exception as e:
+        except IntegrityError:
             print(email_exist)
             await database.rollback()
             raise HTTPException(

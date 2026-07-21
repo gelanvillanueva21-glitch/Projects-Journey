@@ -6,7 +6,6 @@ from config import setting
 class Base(DeclarativeBase): pass
 Engine = create_async_engine(
     setting.database_url,
-    echo = True,
     pool_size = 5,
     max_overflow = 10,
     pool_pre_ping = True
