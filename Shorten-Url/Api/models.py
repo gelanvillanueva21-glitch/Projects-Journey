@@ -17,7 +17,7 @@ class User(Base):
     hashed_password : Mapped[str] = mapped_column(String(255))
     is_active : Mapped[bool] = mapped_column(default = True)
     
-    urls : Mapped["Url"] = relationship(back_populates = "user")
+    urls : Mapped[list["Url"]] = relationship(back_populates = "user")
 
 
 
@@ -35,7 +35,7 @@ class Url(Base):
     expires_at : Mapped[datetime | None] = mapped_column(default = None)
     
     user : Mapped["User"] = relationship(back_populates = "urls")
-    click  : Mapped["Click"] = relationship(back_populates = "url")
+    clicks  : Mapped[list["Click"]] = relationship(back_populates = "url")
     
 
 
@@ -48,6 +48,6 @@ class Click(Base):
     clicked_at : Mapped[datetime] = mapped_column(server_default = func.now())
     ip_address : Mapped[str | None] = mapped_column(String(45), default=None)
     
-    url : Mapped["Url"] = relationship(back_populates = "click")
+    url : Mapped["Url"] = relationship(back_populates = "clicks")
 
 
