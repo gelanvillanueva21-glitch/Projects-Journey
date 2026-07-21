@@ -4,7 +4,7 @@ from config import settings
 
 
 class Base(DeclarativeBase): pass
-Engine = create_async_engine(
+engine = create_async_engine(
     settings.database_url,
     pool_size = 5,
     max_overflow = 7,
@@ -12,11 +12,17 @@ Engine = create_async_engine(
 )
 
 
-LocalSession = async_sessionmaker(
-    Engine,
+async_session_local = async_sessionmaker(
+    engine,
     class_ = AsyncSession,
     expire_on_commit = False,
     autocommit = False,
     autoflush = False
 )
+
+
+async def get_database():
+    async with async_session_local as session:
+        yield session
+
 
