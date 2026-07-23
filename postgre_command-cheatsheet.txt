@@ -119,3 +119,4 @@ DROP TABLE IF EXISTS broken_table;
 python init_db.py
 
 
+
