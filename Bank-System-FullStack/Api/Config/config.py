@@ -1,6 +1,10 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+
+# This is the settings which is connected to the
+# .env file so the secret_key and database location
+# con not be easily leaked
 class Settings(BaseSettings):
     database_url : str = "postgresql+asyncpg://user:password@localhost/bank_db"
     secret_key : str = "duygqwdaijdjwqoifjqwo"
@@ -13,7 +17,7 @@ class Settings(BaseSettings):
     )
 
 
-
+# Variable for the setting class
 settings = Settings()
 
 
