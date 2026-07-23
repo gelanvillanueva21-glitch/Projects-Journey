@@ -29,7 +29,7 @@ async def register(
                 )
             data = await create_user(database, user)
             return data
-        except IntegrityError:
+        except Exception:
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
                 detail = "Account already exist"

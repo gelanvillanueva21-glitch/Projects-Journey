@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from models import User, Url, Click
-from schemas import UserCreate, UrlCreate
+from schemas import CreateUser, UrlCreate
 from auth import hash_password
 import secrets
 import string
@@ -34,7 +34,7 @@ async def get_user_email(
 
 async def create_user(
     database : AsyncSession,
-    user : UserCreate
+    user : CreateUser
 ) -> User:
         hash_pass = hash_password(user.password)
         user_data = User(

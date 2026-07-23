@@ -1,0 +1,121 @@
+
+
+
+# Connect to specific database
+psql -U postgres -d database_name
+
+# Connect and prompt for password
+psql -U postgres -d database_name -W
+
+# Connect as specific user to specific database
+psql -U username -h localhost -p 5432 -d database_name
+
+
+
+
+-- List all databases
+\l
+
+-- Create database
+CREATE DATABASE database_name;
+
+-- Drop database (deletes everything)
+DROP DATABASE database_name;
+
+-- Connect to different database
+\c database_name
+
+-- Exit psql
+\q
+
+
+
+-- List all tables in current database
+\dt
+
+-- Describe table structure
+\d table_name
+
+-- Create table (example)
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Drop table (deletes table and all data)
+DROP TABLE IF EXISTS table_name;
+
+-- Drop multiple tables
+DROP TABLE IF EXISTS table1, table2, table_name;
+
+
+
+
+-- List all users
+\du
+
+-- Create user
+CREATE USER username WITH PASSWORD 'password';
+
+-- Grant privileges
+GRANT ALL PRIVILEGES ON DATABASE database_name TO username;
+
+-- Grant table privileges
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO username;
+
+
+
+-- View all rows
+SELECT * FROM table_name;
+
+-- View specific columns
+SELECT id, email FROM users;
+
+-- Count rows
+SELECT COUNT(*) FROM table_name;
+
+-- Insert row
+INSERT INTO users (email, hashed_password) 
+VALUES ('test@example.com', 'hashed_string');
+
+-- Update row
+UPDATE users 
+SET is_active = false 
+WHERE id = 1;
+
+-- Delete row
+DELETE FROM users WHERE id = 1;
+
+
+
+-- Table doesn't exist? Check schema
+SELECT * FROM information_schema.tables WHERE table_schema = 'public';
+
+-- Reset sequence after deleting rows (if ID gets stuck)
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+
+-- Force disconnect all users to drop database
+SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'database_name';
+
+
+
+# 1. Connect
+psql -U postgres -d mydb
+
+# 2. Check tables
+\dt
+
+# 3. Check data
+SELECT * FROM users;
+
+# 4. Fix something
+DROP TABLE IF EXISTS broken_table;
+
+# 5. Exit
+\q
+
+# 6. Recreate from SQLAlchemy
+python init_db.py
+
+
