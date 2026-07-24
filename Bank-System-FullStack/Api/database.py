@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker, AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase
 from Config.config import settings
 
@@ -6,7 +6,9 @@ from Config.config import settings
 
 # This is our Base to use this in the models
 # purpose for the tables
-class Base(DeclarativeBase): pass
+# Added AsyncAttrs in the Base, so we can fetch
+# data that has a relationship using await
+class Base(AsyncAttrs, DeclarativeBase): pass
 engine = create_async_engine(
     settings.database_url,
     pool_size = 5,
