@@ -22,7 +22,9 @@ class User(Base):
         server_default = func.now())
     availabe_balance : Mapped[int] = mapped_column(default = 0)
     
-    loans : Mapped[list["Loan"]] = relationship(back_populates = "owner")
+    loans : Mapped[list["Loan"]] = relationship(
+        back_populates = "owner", 
+        cascade = "all, delete-orphan")
     withdraws : Mapped[list["Withdraw"]] = relationship(back_populates = "owner")
     deposits : Mapped[list["Deposit"]] = relationship(back_populates = "owner")
     loan_payment_history = Mapped[list["LoanPayment"]] = relationship(back_populates = "owner")
