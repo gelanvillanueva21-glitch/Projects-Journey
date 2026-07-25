@@ -42,6 +42,7 @@ class Loan(Base):
     monthly_due_date : Mapped[datetime | None] = mapped_column(default = None)
     loan_balance : Mapped[int]
     anual_interest_rate : Mapped[int]
+    is_paid : Mapped[bool] = mapped_column(default = False)
     
     owner : Mapped["User"] = relationship(back_populates = "loans")
 
@@ -51,7 +52,7 @@ class LoanPayment(Base):
     __tablename__ = "loanpayment"
     
     id : Mapped[int] = mapped_column(primary_key = True)
-    deptor_paid_id : Mapped[int]
+    deptor_id : Mapped[int]
     lender_id : Mapped[int]
     paid_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),

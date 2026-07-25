@@ -24,9 +24,7 @@ class UserResponse(BaseModel):
 
 
 
-class Laon(BaseModel):
-    deptor_id : int
-    lender_id : int
+class LaonMoney(BaseModel):
     loan_value : int
     anual_interest_rate : int
     monthly_due_date : datetime | None
@@ -34,23 +32,18 @@ class Laon(BaseModel):
 
 
 
-class LoanRespone(BaseModel):
-    loan_value : int
-    anual_interest_rate : int
-    monthly_due_date : datetime | None
-    due_date : datetime | None
-    
+class LoanRespone(LaonMoney):
     model_config = ConfigDict(from_attributes = True)
 
 
 
-class Withdraw(BaseModel):
+class WithdrawMoney(BaseModel):
     id : int
     withdraw_amount : int
 
 
 
-class Deposit(BaseModel):
+class DepositMoney(BaseModel):
     id : int
     deposit_amount : int
 
