@@ -13,7 +13,7 @@ router = APIRouter(prefix = "/user", tags = ["user"])
 
 
 
-@router.post("/create", response_model = UserResponse)
+@router.post("/create", response_model = UserResponse, status_code = status.HTTP_201_CREATED)
 async def create_user(
     database : DependencyDatabase,
     user_data : CreateUser):

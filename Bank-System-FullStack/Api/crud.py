@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from models import User, Loan, LoanPayment, Withdraw, Deposit, LoanHistory
-from schemas import CreateUser, DepositMoney, WithdrawMoney, LaonMoney, LoanPay
+from schemas import CreateUser, DepositMoney, WithdrawMoney, LoanMoney, LoanPay
 from datetime import datetime, timezone
 from auth import hash_password
 
@@ -38,15 +38,15 @@ async def create_user_account(
 # and getting the deptor id to save
 async def borrow_money(
     database : AsyncSession,
-    loan : LaonMoney,
+    loan : LoanMoney,
     deptor_id : int,
     lender_id : int
 ) -> Loan:
         result = await check_loaned_exist(database, deptor_id, lender_id)
         if result:
-            return None
+            return "You have not fully paid yet"
         if await is_loaned_limit(database, deptor_id):
-            return None
+            return "Loan has reach to its maximum"
         
         borrowed_data = Loan(
             deptor_id = deptor_id,
@@ -59,7 +59,7 @@ async def borrow_money(
         
         data = await database.get(User, lender_id)
         if not data:
-            return None
+            return "Data not found"
         data.amount_lend -= loan.loan_value
         database.add(borrowed_data)
         await database.commit()
@@ -77,8 +77,8 @@ async def payment(
     lender_id : int
 ) -> LoanPayment | str | None:
         data = await check_loaned_exist(database, deptor_id, lender_id)
-        if data:
-            return None
+        if not data:
+            return "Loan did not exist"
         if not await check_due_date(database, deptor_id, lender_id):
             increament_interest_rate(database, deptor_id, lender_id)
             return "Your payment is past due. A 1 percent late fee has been applied to your total."

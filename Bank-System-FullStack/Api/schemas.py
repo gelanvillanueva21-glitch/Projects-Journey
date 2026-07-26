@@ -24,7 +24,7 @@ class UserResponse(BaseModel):
 
 
 
-class LaonMoney(BaseModel):
+class LoanMoney(BaseModel):
     loan_value : int
     anual_interest_rate : int
     monthly_due_date : datetime | None = None
@@ -32,7 +32,7 @@ class LaonMoney(BaseModel):
 
 
 
-class LoanRespone(LaonMoney):
+class LoanRespons(LoanMoney):
     model_config = ConfigDict(from_attributes = True)
 
 
