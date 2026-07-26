@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import Field
 from typing import Annotated
 from Router.authentication import get_current_user, DependencyDatabase
 from schemas import LoanMoney, LoanPay, LoanRespons
 from models import LoanHistory, Loan, LoanPayment, User
 from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders
+from hmac_auth import verify_hmac
 
 
 
@@ -16,15 +18,22 @@ router = APIRouter(prefix = "/loan", tags = ["loan"])
 async def borrow(
     database : DependencyDatabase,
     current_user : Annotated[User, Depends(get_current_user)],
-    lender_user : str,
+    lender_user : int,
+    signature : str,
     loan : LoanMoney):
-    data = await borrow_money(database, loan, current_user.id, lender_user)
-    if isinstance(data, str):
-        raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = data
-        )
-    return data
+    result = verify_hmac(str(lender_user).encode("utf-8"), signature.encode("utf-8"))
+    if result:
+        data = await borrow_money(database, loan, current_user.id, lender_user)
+        if isinstance(data, str):
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = data
+            )
+        return data
+    raise HTTPException(
+        status_code = status.HTTP_401_UNAUTHORIZED,
+        detail = "Unauthorized data trying to access database"
+    )
 
 
 
@@ -32,8 +41,10 @@ async def borrow(
 async def loan_payment(
     database : DependencyDatabase,
     payment_info : LoanPay,
-    lender_user : str,
+    lender_user : int,
+    signature : str,
     current_user : Annotated[User, Depends(get_current_user)]):
+        result = verify_hmac(str(lender_user).encode("utf-8"), signature.encode("utf-8"))
         data = await payment(
             database, 
             payment_info, 
@@ -50,6 +61,50 @@ async def loan_payment(
 
 
 
+
+
+
+@router.post("/activate")
+async def activate_lender(
+    database : DependencyDatabase,
+    amount : Annotated[int, Field(ge = 1000, le = 10000)],
+    current_user : Annotated[User, Depends(get_current_user)]):
+
+        result = await active_lend(database, get_current_user.id)
+        if not result:
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+        data = await lend_amount(database, current_user.id, amount)
+        if not data:
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+        return {"status" : "success"}
+
+
+
+@router.get("/lenders")
+async def get_lenders(database : DependencyDatabase):
+    data = await get_available_lenders(database)
+    return {
+        "status" : "success",
+        "lenders_data" : data
+    }
+
+
+
+
+@router.get("/archive")
+async def get_archive_data(
+    database : AsyncSession, 
+    current_user : Annotated[User, Depends(get_current_user)]):
+        data = await get_archived_loan(database, current_user.id)
+        if isinstance(data, str):
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = data
+            )
+        return {
+            "status" : "success",
+            "archive_data" : data
+        }
 
 
 

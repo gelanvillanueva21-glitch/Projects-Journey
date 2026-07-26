@@ -8,6 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     database_url : str = "postgresql+asyncpg://user:password@localhost/bank_db"
     secret_key : str = "duygqwdaijdjwqoifjqwo"
+    hmac_key : str = "faswokqdkoqkfqj"
     algorithm : str = "HS256"
     access_token_expire_hour : int = 12
     

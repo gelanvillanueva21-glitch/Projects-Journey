@@ -4,6 +4,7 @@ from models import User, Loan, LoanPayment, Withdraw, Deposit, LoanHistory
 from schemas import CreateUser, DepositMoney, WithdrawMoney, LoanMoney, LoanPay
 from datetime import datetime, timezone
 from auth import hash_password
+from hmac_auth import create_hmac
 
 
 # A function that gets an info in database table using email
@@ -145,20 +146,22 @@ async def lend_amount(
 async def get_archived_loan(
     database : AsyncSession,
     user_id : int
-) -> list[LoanHistory]:
+) -> list[LoanHistory] | str:
         data = await database.execute(select(LoanHistory).where(LoanHistory.deptor_id == user_id))
         result = await database.stream_scalars(data)
-        output_list = []
-        async for info in result:
-            loan_info = {
-                "id" : info.id,
-                "deptor_id" : info.deptor_id,
-                "lender_id" : info.lender_id,
-                "paid_date" : info.paid_date,
-                "complete_paid" : info.is_paid
-            }
-            output_list.append(loan_info)
-        return output_list
+        if result:
+            output_list = []
+            async for info in result:
+                loan_info = {
+                    "id" : info.id,
+                    "deptor_id" : info.deptor_id,
+                    "lender_id" : info.lender_id,
+                    "paid_date" : info.paid_date,
+                    "complete_paid" : info.is_paid
+                }
+                output_list.append(loan_info)
+            return output_list
+        return "You don not have loan history"
 
 
 
@@ -174,12 +177,14 @@ async def get_available_lenders(database : AsyncSession):
     output_list = []
     async for user in result:
         output_list.append([{
+            "id" : user.id,
             "email" : user.email,
             "name" : user.name,
             "active" : user.is_acitve,
             "interest" : user.anual_interest_rate,
             "available_lend_amount" : user.amount_lend,
             "created_at" : user.created_at,
+            "hmac_signature" : create_hmac(str(user.id).encode("utf-8"))
         }])
     return output_list
 
