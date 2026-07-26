@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey, func, DateTime, DECIMAL
+from sqlalchemy import String, ForeignKey, func, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from database import Base
@@ -14,7 +14,8 @@ class User(Base):
     name : Mapped[str] = mapped_column(String(155))
     is_active : Mapped[bool] = mapped_column(default = True)
     can_lend : Mapped[bool] = mapped_column(default = False)
-    monthly_payment_amount : Mapped[DECIMAL] = mapped_column(default = 0.00)
+    monthly_payment_amount : Mapped[int] = mapped_column(default = 30)
+    due_date : Mapped[datetime]
     anual_interest_rate : Mapped[int] = mapped_column(default = 0)
     amount_lend : Mapped[int] = mapped_column(default = 0)
     created_at : Mapped[datetime] = mapped_column(
@@ -27,7 +28,8 @@ class User(Base):
         cascade = "all, delete-orphan")
     withdraws : Mapped[list["Withdraw"]] = relationship(back_populates = "owner")
     deposits : Mapped[list["Deposit"]] = relationship(back_populates = "owner")
-    loan_payment_history = Mapped[list["LoanPayment"]] = relationship(back_populates = "owner")
+    loan_payment_history : Mapped[list["LoanPayment"]] = relationship(back_populates = "owner")
+    loan_archived : Mapped[list["LoanHistory"]] = relationship(back_populates = "owner")
 
 
 
@@ -44,7 +46,6 @@ class Loan(Base):
     monthly_due_date : Mapped[datetime | None] = mapped_column(default = None)
     loan_balance : Mapped[int]
     anual_interest_rate : Mapped[int]
-    is_paid : Mapped[bool] = mapped_column(default = False)
     
     owner : Mapped["User"] = relationship(back_populates = "loans")
 
@@ -62,6 +63,21 @@ class LoanPayment(Base):
     paid_amount : Mapped[int]
     
     owner : Mapped["User"] = relationship(back_populates = "loan_payment_history")
+
+
+
+class LoanHistory(Base):
+    __tablename__ = "loan_archive"
+    
+    id : Mapped[int] = mapped_column(primary_key = True)
+    deptor_id : Mapped[int]
+    lender_id : Mapped[int]
+    paid_date : Mapped[datetime] = mapped_column(
+        DateTime(timezone = True),
+        server_default = func.now())
+    is_paid : Mapped[bool] = mapped_column(default = True)
+    
+    owner = Mapped["User"] = relationship(back_populates = "loan_archived")
 
 
 

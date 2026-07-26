@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
-from models import User, Loan, LoanPayment, Withdraw, Deposit
+from models import User, Loan, LoanPayment, Withdraw, Deposit, LoanHistory
 from schemas import CreateUser, DepositMoney, WithdrawMoney, LaonMoney, LoanPay
 from datetime import datetime, timezone
 from auth import hash_password
@@ -43,7 +43,9 @@ async def borrow_money(
     lender_id : int
 ) -> Loan:
         result = await check_loaned_exist(database, deptor_id, lender_id)
-        if not result:
+        if result:
+            return None
+        if await is_loaned_limit(database, deptor_id):
             return None
         
         borrowed_data = Loan(
@@ -54,6 +56,11 @@ async def borrow_money(
             loan_balance = loan.loan_value,
             anual_interest_rate = loan.anual_interest_rate
         )
+        
+        data = await database.get(User, lender_id)
+        if not data:
+            return None
+        data.amount_lend -= loan.loan_value
         database.add(borrowed_data)
         await database.commit()
         await database.refresh(borrowed_data)
@@ -70,7 +77,7 @@ async def payment(
     lender_id : int
 ) -> LoanPayment | str | None:
         data = await check_loaned_exist(database, deptor_id, lender_id)
-        if not data:
+        if data:
             return None
         if not await check_due_date(database, deptor_id, lender_id):
             increament_interest_rate(database, deptor_id, lender_id)
@@ -98,6 +105,85 @@ async def payment(
         await database.commit()
         await database.refresh(payment)
         return payment
+
+
+
+
+# A function that activate lender so you can lend them
+# a money
+async def active_lend(
+    database : AsyncSession,
+    id : int):
+    data = await database.get(User, id)
+    if not data:
+        return None
+    data.can_lend = True
+    await database.commit()
+    return True
+
+
+
+
+# A function that modefy how much can you lend to the user
+async def lend_amount(
+    database : AsyncSession,
+    id : int,
+    amount : int):
+    data = await database.get(User, id)
+    if data.can_lend:
+        if amount > 100 and amount < 10000 and data.availabe_balance > amount:
+            data.amount_lend += amount
+            data.availabe_balance -= amount
+    await database.commit()
+    await database.refresh(data)
+    return data
+
+
+
+
+# A function to get the archived loan history
+async def get_archived_loan(
+    database : AsyncSession,
+    user_id : int
+) -> list[LoanHistory]:
+        data = await database.execute(select(LoanHistory).where(LoanHistory.deptor_id == user_id))
+        result = await database.stream_scalars(data)
+        output_list = []
+        async for info in result:
+            loan_info = {
+                "id" : info.id,
+                "deptor_id" : info.deptor_id,
+                "lender_id" : info.lender_id,
+                "paid_date" : info.paid_date,
+                "complete_paid" : info.is_paid
+            }
+            output_list.append(loan_info)
+        return output_list
+
+
+
+
+# A function that will return all the user
+# that is available to lend a loan
+async def get_available_lenders(database : AsyncSession):
+    data = database.execute(select(User).where(
+        User.can_lend == True,
+        User.availabe_balance >= 1000
+    ))
+    result = await database.stream_scalars(data)
+    output_list = []
+    async for user in result:
+        output_list.append([{
+            "email" : user.email,
+            "name" : user.name,
+            "active" : user.is_acitve,
+            "interest" : user.anual_interest_rate,
+            "available_lend_amount" : user.amount_lend,
+            "created_at" : user.created_at,
+        }])
+    return output_list
+
+
 
 
 
@@ -228,17 +314,45 @@ async def decreas_amount(
 
 
 
+# A helper function to check if the balance is
+# zero if it does zero delete the data inside the database
 async def check_loan_balance(
     database : AsyncSession,
     loan : Loan,
     deptor_id : int,
     lender_id : int):
-    if loan.loan_balance <= 0:
-        delete_row_loan = await database.execute(delete(Loan).where(
+    if loan.loan_balance == 0:
+        delete_row_loan = await database.execute(select(Loan).where(
             Loan.debtor_id == deptor_id,
             Loan.lender_id == lender_id
         ))
+        data = delete_row_loan.scalar_one_or_none()
+        archived_loan = LoanHistory(
+            deptor_id = data.debtor_id,
+            lender_id = data.lender_id
+        )
+        database.add(archived_loan)
+        await database.delete(delete_row_loan)
         await database.commit()
+        await database.refresh(archived_loan)
+
+
+
+
+# A helper function to see if the user already
+# maximum the loaned
+async def is_loaned_limit(
+    database : AsyncSession,
+    deptor_id : int) -> bool:
+        data = await database.execute(select(Loan).where(Loan.deptor_id == deptor_id,))
+        data = data.scalars().all()
+        if len(data) == 5:
+            return True
+        return False
+
+
+
+
 
 
 
