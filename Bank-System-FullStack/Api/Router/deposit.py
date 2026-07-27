@@ -23,9 +23,10 @@ async def deposit_amount(
                 status_code = status.HTTP_400_BAD_REQUEST,
                 detail = "Error occured during deposit"
             )
+        print(data.available_balance)
         return {
             "status" : "success",
-            "balance" : data.deposit_balance
+            "balance" : data.available_balance
         }
 
 

@@ -26,10 +26,9 @@ async def create_user_account(
         hashed_pass = hash_password(user.password)
         user_data = User(
             email = user.email,
-            hashed_password = hash_password,
+            hashed_password = hashed_pass,
             name = user.name
         )
-        print(user_data)
         database.add(user_data)
         await database.commit()
         await database.refresh(user_data)
@@ -239,13 +238,15 @@ async def get_withdraws(
 async def deposit(
     database : AsyncSession,
     user_id : int,
-    amount : int) -> Deposit | None:
-        response = await database.execute(select(User).where(User.id == user_id))
-        data = response.scalar_one_or_none()
-        if data:
-            data.availabe_balance += amount
-            await database.commit()
-            await database.refresh()
+    amount : int) -> User | None:
+        data = await database.execute(
+            update(User)
+            .where(User.id == user_id)
+            .values(available_balance = User.available_balance + amount))
+        deposit_data = Deposit(deposit_balance = amount)
+        database.add(deposit_data)
+        await database.commit()
+        await database.refresh(data)
         return data
 
 

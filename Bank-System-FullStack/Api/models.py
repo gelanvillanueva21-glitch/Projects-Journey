@@ -10,18 +10,18 @@ class User(Base):
     
     id : Mapped[int] = mapped_column(primary_key = True)
     email : Mapped[str] = mapped_column(String(225), unique = True, index = True)
-    hashed_password : Mapped[str] = mapped_column(String(150))
+    hashed_password : Mapped[str] = mapped_column(String(225))
     name : Mapped[str] = mapped_column(String(155))
     is_active : Mapped[bool] = mapped_column(default = True)
     can_lend : Mapped[bool] = mapped_column(default = False)
     monthly_payment_amount : Mapped[int] = mapped_column(default = 30)
-    due_date : Mapped[datetime]
+    due_date : Mapped[datetime | None] = mapped_column(default = None)
     anual_interest_rate : Mapped[int] = mapped_column(default = 0)
     amount_lend : Mapped[int] = mapped_column(default = 0)
     created_at : Mapped[datetime] = mapped_column(
         DateTime(timezone = True), 
         server_default = func.now())
-    availabe_balance : Mapped[int] = mapped_column(default = 0)
+    available_balance : Mapped[int] = mapped_column(default = 0)
     
     loans : Mapped[list["Loan"]] = relationship(
         back_populates = "owner", 

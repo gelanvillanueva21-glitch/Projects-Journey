@@ -30,14 +30,14 @@ async def login(
                 status_code = status.HTTP_401_UNAUTHORIZED,
                 detail = "Incorrect email or password"
             )
-            access_token = create_jwt(
+        access_token = create_jwt(
                 data = {"sub" : user.email},
                 expires_delta = timedelta(hours=12)
-            )
-            return {
-                "access_token" : access_token,
-                "token_type" : "bearer"
-            }
+        )
+        return {
+            "access_token" : access_token,
+            "token_type" : "bearer"
+        }
 
 
 

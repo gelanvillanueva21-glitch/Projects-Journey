@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from typing import Annotated
 from schemas import UserResponse, CreateUser
@@ -31,7 +30,7 @@ async def create_user(
             await database.rollback()
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
-                detail = "Email already registered"
+                detail = "An error occured during creating account"
             )
 
 
