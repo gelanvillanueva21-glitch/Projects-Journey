@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import Field
 from typing import Annotated
@@ -37,7 +37,7 @@ async def borrow(
 
 
 
-@router.post("/pay", response_model = LoanPayment)
+@router.post("/pay", response_model = LoanPay)
 async def loan_payment(
     database : DependencyDatabase,
     payment_info : LoanPay,
@@ -53,9 +53,9 @@ async def loan_payment(
         if isinstance(data, str) or data is None:
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
-                detail = data if data else "Error occured during payment request"
+                detail = data if data else "Error occured during payment"
             )
-        return data
+        return {"paid_amount" : data.paid_amount}
 
 
 
@@ -67,7 +67,7 @@ async def loan_payment(
 @router.post("/activate")
 async def activate_lender(
     database : DependencyDatabase,
-    amount : Annotated[int, Field(ge = 1000, le = 10000)],
+    amount : Annotated[int, Query(ge=1000, le=10000)],
     current_user : Annotated[User, Depends(get_current_user)]):
 
         result = await active_lend(database, get_current_user.id)
@@ -93,14 +93,9 @@ async def get_lenders(database : DependencyDatabase):
 
 @router.get("/archive")
 async def get_archive_data(
-    database : AsyncSession, 
+    database : DependencyDatabase, 
     current_user : Annotated[User, Depends(get_current_user)]):
         data = await get_archived_loan(database, current_user.id)
-        if isinstance(data, str):
-            raise HTTPException(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                detail = data
-            )
         return {
             "status" : "success",
             "archive_data" : data

@@ -5,6 +5,7 @@ from datetime import datetime
 
 
 class UserBase(BaseModel):
+    name : str
     email : EmailStr
 
 
@@ -15,7 +16,6 @@ class CreateUser(UserBase):
 
 
 class UserResponse(BaseModel):
-    id : int
     email : EmailStr
     is_active : Annotated[bool, Field(default = True)]
     
@@ -41,17 +41,6 @@ class LoanPay(BaseModel):
     paid_amount : int
     
     model_config = ConfigDict(from_attributes = True)
-
-
-class WithdrawMoney(BaseModel):
-    id : int
-    amount : int
-
-
-
-class DepositMoney(BaseModel):
-    id : int
-    amount : int
 
 
 

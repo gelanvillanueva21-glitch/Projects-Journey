@@ -37,7 +37,7 @@ class Loan(Base):
     __tablename__ = "loans"
     
     id : Mapped[int] = mapped_column(primary_key = True)
-    debtor_id : Mapped[int]
+    debtor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     lender_id : Mapped[int]
     loaned_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = False),
@@ -55,7 +55,7 @@ class LoanPayment(Base):
     __tablename__ = "loanpayment"
     
     id : Mapped[int] = mapped_column(primary_key = True)
-    deptor_id : Mapped[int]
+    deptor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     lender_id : Mapped[int]
     paid_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
@@ -70,14 +70,14 @@ class LoanHistory(Base):
     __tablename__ = "loan_archive"
     
     id : Mapped[int] = mapped_column(primary_key = True)
-    deptor_id : Mapped[int]
+    deptor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     lender_id : Mapped[int]
     paid_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
         server_default = func.now())
     is_paid : Mapped[bool] = mapped_column(default = True)
     
-    owner = Mapped["User"] = relationship(back_populates = "loan_archived")
+    owner : Mapped["User"] = relationship(back_populates = "loan_archived")
 
 
 
@@ -89,9 +89,9 @@ class Withdraw(Base):
     date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
         server_default = func.now())
-    withdraw_balance : Mapped[int]
+    withdraw_amount : Mapped[int]
     
-    owner : Mapped["User"] = mapped_column(relationship(back_populates = "withdraws"))
+    owner : Mapped["User"] = relationship(back_populates = "withdraws")
 
 
 
@@ -99,13 +99,13 @@ class Deposit(Base):
     __tablename__ = "deposits"
     
     id : Mapped[int] = mapped_column(primary_key = True)
-    user_id : Mapped[int]
+    user_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
         server_default = func.now())
     deposit_balance : Mapped[int]
     
-    owner = Mapped["User"] = relationship(back_populates = "deposits")
+    owner : Mapped["User"] = relationship(back_populates = "deposits")
 
 
 
