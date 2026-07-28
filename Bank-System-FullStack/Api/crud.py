@@ -51,6 +51,7 @@ async def borrow_money(
             return "Loan has reach to its maximum"
         
         borrowed_data = Loan(
+            deptor_id = deptor_id,
             lender_id = lender_id,
             due_date = loan.due_date,
             monthly_due_date = loan.monthly_due_date,
@@ -238,16 +239,16 @@ async def get_withdraws(
 async def deposit(
     database : AsyncSession,
     user_id : int,
-    amount : int) -> User | None:
-        data = await database.execute(
+    amount : int):
+        await database.execute(
             update(User)
             .where(User.id == user_id)
             .values(available_balance = User.available_balance + amount))
         deposit_data = Deposit(deposit_balance = amount)
         database.add(deposit_data)
+        print("Hello")
         await database.commit()
-        await database.refresh(data)
-        return data
+        return await get_balance(database, user_id)
 
 
 
@@ -398,6 +399,14 @@ async def is_loaned_limit(
         return False
 
 
+
+
+# A helper function to get the current amount of the account
+async def get_balance(
+    database : AsyncSession,
+    user_id : int):
+    data = await database.get(User, user_id)
+    return data.available_balance
 
 
 
