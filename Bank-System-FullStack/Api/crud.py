@@ -3,7 +3,7 @@ from sqlalchemy import select, update, delete
 from models import User, Loan, LoanPayment, Withdraw, Deposit, LoanHistory
 from schemas import CreateUser, LoanMoney, LoanPay
 from datetime import datetime, timezone
-from auth import hash_password
+from auth import hash_password, verify_password
 from hmac_auth import create_hmac
 
 
@@ -36,6 +36,23 @@ async def create_user_account(
 
 
 
+
+# A function to change password on a specific account
+async def change_user_password(
+    database : AsyncSession,
+    current_password : str,
+    new_hashed_password : str,
+    user_account : User) -> bool:
+        is_pass_same = verify_password(current_password, user_account.hashed_password)
+        if not is_pass_same:
+            return False
+        user_account.hashed_password = new_hashed_password
+        await database.commit()
+        return True
+
+
+
+
 # A function to borrow money from lender using lender_id
 # and getting the deptor id to save
 async def borrow_money(
@@ -43,15 +60,15 @@ async def borrow_money(
     loan : LoanMoney,
     deptor_id : int,
     lender_id : int
-) -> Loan:
+) -> Loan | str:
         result = await check_loaned_exist(database, deptor_id, lender_id)
         if result:
             return "You have not fully paid yet"
         if await is_loaned_limit(database, deptor_id):
             return "Loan has reach to its maximum"
-        
+        print("hello")
         borrowed_data = Loan(
-            deptor_id = deptor_id,
+            debtor_id = deptor_id,
             lender_id = lender_id,
             due_date = loan.due_date,
             monthly_due_date = loan.monthly_due_date,
@@ -125,20 +142,50 @@ async def active_lend(
 
 
 
+# A function that deactivate lender
+async def deactive_lend(
+    database : AsyncSession,
+    id : int):
+    data = await database.get(User, id)
+    if not data:
+        return None
+    data.can_lend = False
+    data.available_balance += data.amount_lend
+    data.amount_lend = 0
+    await database.commit()
+    return True
+
+
+
 
 # A function that modefy how much can you lend to the user
 async def lend_amount(
     database : AsyncSession,
     id : int,
-    amount : int):
+    amount : int,
+    interest : int):
     data = await database.get(User, id)
     if data.can_lend:
-        if amount > 100 and amount < 10000 and data.availabe_balance > amount:
+        if amount > 100 and amount < 10000 and data.available_balance > amount:
+            data.anual_interest_rate += interest
             data.amount_lend += amount
-            data.availabe_balance -= amount
+            data.available_balance -= amount
+            await database.commit()
+            await database.refresh(data)
+            return data
+    return None
+
+
+
+
+# A function that will delete archive loan data
+# in database
+async def delete_archive_loan(
+    database : AsyncSession,
+    id : int):
+    data = await database.execute(delete(LoanHistory).where(LoanHistory.deptor_id == id))
     await database.commit()
-    await database.refresh(data)
-    return data
+    return True
 
 
 
@@ -146,21 +193,18 @@ async def lend_amount(
 # A function to get the archived loan history
 async def get_archived_loan(
     database : AsyncSession,
-    user_id : int) -> list:
+    user_id : int) -> list[LoanHistory]:
         data = await database.execute(select(LoanHistory).where(LoanHistory.deptor_id == user_id))
-        result = await database.stream_scalars(data)
-        if result:
-            output_list = []
-            async for info in result:
-                loan_info = {
-                    "id" : info.id,
+        result = data.scalars().all()
+        output_list = []
+        if len(result) != 0:
+            for info in result:
+                output_list.append({
                     "deptor_id" : info.deptor_id,
                     "lender_id" : info.lender_id,
-                    "paid_date" : info.paid_date,
-                    "complete_paid" : info.is_paid
-                }
-                output_list.append(loan_info)
-            return output_list
+                    "is_paid" : info.is_paid,
+                    "date" : info.paid_date
+                })
         return output_list
 
 
@@ -169,22 +213,22 @@ async def get_archived_loan(
 # A function that will return all the user
 # that is available to lend a loan
 async def get_available_lenders(database : AsyncSession):
-    data = database.execute(select(User).where(
+    data = await database.execute(select(User).where(
         User.can_lend == True,
-        User.availabe_balance >= 1000
+        User.available_balance >= 1000
     ))
-    result = await database.stream_scalars(data)
+    result = data.scalars().all()
     output_list = []
-    async for user in result:
-        output_list.append([{
-            "id" : user.id,
-            "name" : user.name,
-            "active" : user.is_acitve,
-            "interest" : user.anual_interest_rate,
-            "available_lend_amount" : user.amount_lend,
-            "created_at" : user.created_at,
-            "hmac_signature" : create_hmac(str(user.id).encode("utf-8"))
-        }])
+    if len(result) != 0:
+        for info in result:
+            output_list.append({
+                "id" : info.id,
+                "name" : info.name,
+                "amount_lend" : info.amount_lend,
+                "is_active" : info.is_active,
+                "anual_interest_rate" : info.anual_interest_rate,
+                "signature" : create_hmac(str(info.id).encode("utf-8"))
+            })
     return output_list
 
 
@@ -199,12 +243,13 @@ async def withdraw(
     user_id : int,
     amount : int
 ) -> Withdraw | None:
-        response = await database.execute(select(User).where(
-            User.id == user_id))
-        data = response.scalar_one_or_none()
-        if data.availabe_balance > amount:
-            data.availabe_balance -= amount
-            withdraw_data = Withdraw(withdraw_amount = amount)
+        data = await database.get(User, user_id)
+        withdraw_data = None
+        if data.available_balance > amount:
+            data.available_balance -= amount
+            withdraw_data = Withdraw(
+                user_id = user_id,
+                withdraw_amount = amount)
             database.add(withdraw_data)
             await database.commit()
             await database.refresh(data)
@@ -218,19 +263,28 @@ async def withdraw(
 # of the users
 async def get_withdraws(
     database : AsyncSession,
-    user_id : int) -> list:
+    user_id : int) -> list[Withdraw]:
         data = await database.execute(select(Withdraw).where(Withdraw.user_id == user_id))
-        result = await database.stream_scalars(data)
+        result = data.scalars().all()
         output_list = []
-        if result:
+        if len(result) != 0:
             for info in result:
-                data_info = {
+                output_list.append({
                     "withdraw_amount" : info.withdraw_amount,
-                    "withdraw_date" : info.date
-                }
-                output_list.append([data_info])
-            return output_list
+                    "date" : info.date
+                })
         return output_list
+
+
+
+
+# A function that delete deposits history
+async def delete_withdraw_history(
+    database : AsyncSession,
+    id : int):
+    data = await database.execute(delete(Withdraw).where(Withdraw.user_id == id))
+    await database.commit()
+    return True
 
 
 
@@ -244,9 +298,10 @@ async def deposit(
             update(User)
             .where(User.id == user_id)
             .values(available_balance = User.available_balance + amount))
-        deposit_data = Deposit(deposit_balance = amount)
+        deposit_data = Deposit(
+            user_id = user_id,
+            deposit_balance = amount)
         database.add(deposit_data)
-        print("Hello")
         await database.commit()
         return await get_balance(database, user_id)
 
@@ -257,18 +312,30 @@ async def deposit(
 # of deposit user
 async def get_deposits(
     database : AsyncSession,
-    user_id : int) -> list:
+    user_id : int) -> list[Deposit]:
         data = await database.execute(select(Deposit).where(Deposit.user_id == user_id))
-        result = await database.stream_scalars(data)
+        result = data.scalars().all()
         output_list = []
-        if result:
+        if len(result) != 0:
             for info in result:
-                data_info = {
-                    "deposit_amount" : info.deposit_amount,
-                    "deposit_date" : info.date
-                }
-            return output_list
+                output_list.append({
+                    "deposit_amount" : info.deposit_balance,
+                    "date" : info.date
+                })
         return output_list
+
+
+
+
+
+# A function that delete the users deposit history
+async def delete_deposits_data(
+    database : AsyncSession,
+    id : int):
+        data = await database.execute(delete(Deposit).where(Deposit.user_id == id))
+        await database.commit()
+        return True
+
 
 
 
@@ -297,7 +364,7 @@ async def check_due_date(
     deptor_id : int,
     lender_id : int) -> bool:
         result = await database.execute(select(Loan).where(
-            Loan.deptor_id == deptor_id,
+            Loan.debtor_id == deptor_id,
             Loan.lender_id == lender_id))
         data = result.scalar_one_or_none()
         
@@ -392,7 +459,7 @@ async def check_loan_balance(
 async def is_loaned_limit(
     database : AsyncSession,
     deptor_id : int) -> bool:
-        data = await database.execute(select(Loan).where(Loan.deptor_id == deptor_id,))
+        data = await database.execute(select(Loan).where(Loan.debtor_id == deptor_id,))
         data = data.scalars().all()
         if len(data) == 5:
             return True

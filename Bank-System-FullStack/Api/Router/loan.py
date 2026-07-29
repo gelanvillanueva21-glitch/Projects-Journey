@@ -5,7 +5,7 @@ from typing import Annotated
 from Router.authentication import get_current_user, DependencyDatabase
 from schemas import LoanMoney, LoanPay, LoanRespons
 from models import LoanHistory, Loan, LoanPayment, User
-from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders
+from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan
 from hmac_auth import verify_hmac
 
 
@@ -21,7 +21,13 @@ async def borrow(
     lender_user : int,
     signature : str,
     loan : LoanMoney):
-    result = verify_hmac(str(lender_user).encode("utf-8"), signature.encode("utf-8"))
+    if current_user.id == lender_user:
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = "You can not loan from yourself"
+        )
+    result = verify_hmac(str(lender_user), signature)
+    print(result)
     if result:
         data = await borrow_money(database, loan, current_user.id, lender_user)
         if isinstance(data, str):
@@ -29,6 +35,7 @@ async def borrow(
                 status_code = status.HTTP_400_BAD_REQUEST,
                 detail = data
             )
+        print("Computer Science")
         return data
     raise HTTPException(
         status_code = status.HTTP_401_UNAUTHORIZED,
@@ -44,7 +51,18 @@ async def loan_payment(
     lender_user : int,
     signature : str,
     current_user : Annotated[User, Depends(get_current_user)]):
-        result = verify_hmac(str(lender_user).encode("utf-8"), signature.encode("utf-8"))
+        if current_user.id == lender_user:
+            raise HTTPException(
+                status_code = status.HTTP_403_FORBIDDEN,
+                detail = "You can not pay or loan your own Account"
+            )
+        result = verify_hmac(str(lender_user), signature)
+        print(result)
+        if not result:
+            raise HTTPException(
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail = "Unauthorized data trying to access database"
+            )
         data = await payment(
             database, 
             payment_info, 
@@ -68,15 +86,36 @@ async def loan_payment(
 async def activate_lender(
     database : DependencyDatabase,
     amount : Annotated[int, Query(ge=1000, le=10000)],
+    interest_rate : Annotated[int, Query(ge=3, le=15)],
     current_user : Annotated[User, Depends(get_current_user)]):
-
-        result = await active_lend(database, get_current_user.id)
+        if current_user.can_lend:
+            raise HTTPException(
+                status_code = status.HTTP_403_FORBIDDEN,
+                detail = "Lender already activate"
+            )
+        result = await active_lend(database, current_user.id)
         if not result:
             raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
-        data = await lend_amount(database, current_user.id, amount)
+        data = await lend_amount(database, current_user.id, amount, interest_rate)
         if not data:
-            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = "Insuficient balance"
+            )
         return {"status" : "success"}
+
+
+
+
+@router.post("/deactivate")
+async def deactivate_lender(
+    database : DependencyDatabase,
+    current_user : Annotated[User, Depends(get_current_user)]):
+        result = await deactive_lend(database, current_user.id)
+        if not result:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        return {"status" : "success"}
+
 
 
 
@@ -103,7 +142,17 @@ async def get_archive_data(
 
 
 
-
+@router.delete("/archive/delete")
+async def delete_archive_data(
+    database : DependencyDatabase,
+    current_user : Annotated[User, Depends(get_current_user)]):
+        result = await delete_archive_loan(database, current_user.id)
+        if not result:
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = "Archived history empty"
+            )
+        return {"status" : "success"}
 
 
 
