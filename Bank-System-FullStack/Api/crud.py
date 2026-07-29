@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from models import User, Loan, LoanPayment, Withdraw, Deposit, LoanHistory
 from schemas import CreateUser, LoanMoney, LoanPay
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from auth import hash_password, verify_password
 from hmac_auth import create_hmac
 
@@ -66,13 +66,13 @@ async def borrow_money(
             return "You have not fully paid yet"
         if await is_loaned_limit(database, deptor_id):
             return "Loan has reach to its maximum"
-        print("hello")
+        total_amount = anual_interest_calculation(loan.loan_value, loan.anual_interest_rate)
         borrowed_data = Loan(
             debtor_id = deptor_id,
             lender_id = lender_id,
             due_date = loan.due_date,
             monthly_due_date = loan.monthly_due_date,
-            loan_balance = loan.loan_value,
+            loan_balance = total_amount,
             anual_interest_rate = loan.anual_interest_rate
         )
         
@@ -99,20 +99,27 @@ async def payment(
         if not data:
             return "Loan did not exist"
         if not await check_due_date(database, deptor_id, lender_id):
-            increament_interest_rate(database, deptor_id, lender_id)
+            await increament_interest_rate(database, deptor_id, lender_id)
+            await database.refresh(data)
+            data.loan_balance = anual_interest_calculation(data.loan_balance, data.anual_interest_rate)
+            
+            if data.due_date:
+                data.due_date = datetime.now(timezone.utc) + timedelta(days=5)
+            else:
+                data.monthly_due_date = datetime.now(timezone.utc) + timedelta(days=5)
+            await database.commit()
             return "Your payment is past due. A 1 percent late fee has been applied to your total."
 
-        payment_amount = await anual_interest_calculation(database, deptor_id, lender_id)
         payment = None
         if data.monthly_due_date:
-            if user_payment.amount == payment_amount:
+            if user_payment.paid_amount == (data.loan_balance / 12):
                 payment = LoanPayment(
                     deptor_id = deptor_id,
                     lender_id = lender_id,
                     paid_amount = user_payment.amount
                 )
         if data.due_date:
-            if user_payment.amount == payment_amount:
+            if user_payment.paid_amount == data.loan_balance:
                 payment = LoanPayment(
                     deptor_id = deptor_id,
                     lender_id = lender_id,
@@ -231,6 +238,26 @@ async def get_available_lenders(database : AsyncSession):
             })
     return output_list
 
+
+
+
+
+# A function that will return current loan that user has
+async def get_current_loans(
+    database : AsyncSession,
+    id : int):
+        data = await database.execute(select(Loan).where(Loan.debtor_id == id))
+        result = data.scalars().all()
+        output_list = []
+        if len(result) != 0:
+            for info in result:
+                output_list.append({
+                    "lender_id" : info.lender_id,
+                    "loaned_date" : info.loaned_date,
+                    "pay_date" : info.due_date if info.due_date is not None else info.monthly_due_date,
+                    "loan_balance" : info.loan_balance
+                })
+        return output_list
 
 
 
@@ -382,22 +409,12 @@ async def check_due_date(
 
 # A helper function to calculate how much must be the
 # payment to pay
-async def anual_interest_calculation(
-    database : AsyncSession,
-    deptor_id : int,
-    lender_id : int):
-        result = await check_loaned_exist(database, deptor_id, lender_id)
-        if not result:
-            return None
-        
-        total_payment = result.loan_balance
-        interest_rate = result.anual_interest_rate
-        if result.monthly_due_date:
-            monthly_payment = (total_payment * (1 + interest_rate / 100)) / 12
-            return monthly_payment
-        
-        if result.due_date:
-            return (total_payment * (1 + interest_rate / 100))
+def anual_interest_calculation(
+    loan_amount : int,
+    anual_interest_rate : int):
+        total_payment = loan_amount
+        interest_rate = anual_interest_rate
+        return (total_payment * (1 + interest_rate / 100))
 
 
 

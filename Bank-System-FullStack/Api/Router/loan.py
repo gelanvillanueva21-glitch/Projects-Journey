@@ -5,7 +5,7 @@ from typing import Annotated
 from Router.authentication import get_current_user, DependencyDatabase
 from schemas import LoanMoney, LoanPay, LoanRespons
 from models import LoanHistory, Loan, LoanPayment, User
-from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan
+from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan, get_current_loans
 from hmac_auth import verify_hmac
 
 
@@ -139,6 +139,21 @@ async def get_archive_data(
             "status" : "success",
             "archive_data" : data
         }
+
+
+
+
+
+@router.get("/current")
+async def get_current_data_loan(
+    database : DependencyDatabase,
+    current_user : Annotated[User, Depends(get_current_user)]):
+        data = await get_current_loans(database, current_user.id)
+        return {
+            "status" : "success",
+            "data" : data
+        }
+
 
 
 
