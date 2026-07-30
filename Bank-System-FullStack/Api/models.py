@@ -25,7 +25,11 @@ class User(Base):
     
     loans : Mapped[list["Loan"]] = relationship(
         back_populates = "deptor_owner", 
-        cascade = "all, delete-orphan")
+        cascade = "all, delete-orphan",
+        foreign_keys = "[Loan.debtor_id]")
+    lender : Mapped[list["Loan"]] = relationship(
+        back_populates = "lender_owner",
+        foreign_keys = "[Loan.lender_id]")
     withdraws : Mapped[list["Withdraw"]] = relationship(
         back_populates = "withdraw_owner",
         cascade = "all, delete-orphan")
@@ -34,10 +38,18 @@ class User(Base):
         cascade = "all, delete-orphan")
     loan_payment_history : Mapped[list["LoanPayment"]] = relationship(
         back_populates = "payment_owner",
-        cascade = "all, delete-orphan")
+        cascade = "all, delete-orphan",
+        foreign_keys = "[LoanPayment.debtor_id]")
+    lender_paid : Mapped[list["LoanPayment"]] = relationship(
+        back_populates = "lender_owner",
+        foreign_keys = "[LoanPayment.lender_id]")
     loan_archived : Mapped[list["LoanHistory"]] = relationship(
         back_populates = "owner",
-        cascade = "all, delete-orphan")
+        cascade = "all, delete-orphan",
+        foreign_keys = "[LoanHistory.debtor_id]")
+    lender_archived : Mapped[list["LoanHistory"]] = relationship(
+        back_populates = "lender_history",
+        foreign_keys = "[LoanHistory.lender_id]")
 
 
 
@@ -55,7 +67,12 @@ class Loan(Base):
     loan_balance : Mapped[int]
     anual_interest_rate : Mapped[int]
     
-    deptor_owner : Mapped["User"] = relationship(back_populates = "loans")
+    deptor_owner : Mapped["User"] = relationship(
+        back_populates = "loans",
+        foreign_keys = [debtor_id])
+    lender_owner : Mapped["User"] = relationship(
+        back_populates = "lender",
+        foreign_keys = [lender_id])
 
 
 
@@ -70,7 +87,12 @@ class LoanPayment(Base):
         server_default = func.now())
     paid_amount : Mapped[int]
     
-    payment_owner : Mapped["User"] = relationship(back_populates = "loan_payment_history")
+    payment_owner : Mapped["User"] = relationship(
+        back_populates = "loan_payment_history",
+        foreign_keys = [debtor_id])
+    lender_owner : Mapped["User"] = relationship(
+        back_populates = "lender_paid",
+        foreign_keys = [lender_id])
 
 
 
@@ -85,7 +107,12 @@ class LoanHistory(Base):
         server_default = func.now())
     is_paid : Mapped[bool] = mapped_column(default = True)
     
-    owner : Mapped["User"] = relationship(back_populates = "loan_archived")
+    owner : Mapped["User"] = relationship(
+        back_populates = "loan_archived",
+        foreign_keys = [debtor_id])
+    lender_history : Mapped["User"] = relationship(
+        back_populates = "lender_archived",
+        foreign_keys = [lender_id])
 
 
 
@@ -99,7 +126,8 @@ class Withdraw(Base):
         server_default = func.now())
     withdraw_amount : Mapped[int]
     
-    withdraw_owner : Mapped["User"] = relationship(back_populates = "withdraws")
+    withdraw_owner : Mapped["User"] = relationship(
+        back_populates = "withdraws")
 
 
 

@@ -24,7 +24,7 @@ def create_jwt(data : dict, expires_delta : timedelta | None = None):
     copy_data = data.copy()
     expired_at = datetime.now(timezone.utc) + (
         expires_delta or timedelta(
-            minutes = settings.access_token_expire_hour))
+            hours = settings.access_token_expire_hour))
     copy_data.update({"exp" : expired_at})
     return jwt.encode(
         copy_data,

@@ -20,6 +20,7 @@ async def create_user(
     user_data : CreateUser):
         try:
             email_exist = await get_user_email(database, user_data.email)
+            print("Computer Science")
             if email_exist:
                 print(email_exist)
                 raise HTTPException(
@@ -27,6 +28,7 @@ async def create_user(
                     detail = "Email already registered"
                 )
             data = await create_user_account(database, user_data)
+            print("Sayonara")
             return data
         except IntegrityError:
             await database.rollback()

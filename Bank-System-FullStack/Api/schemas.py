@@ -27,7 +27,6 @@ class UserResponse(BaseModel):
 
 class LoanMoney(BaseModel):
     loan_value : Annotated[int, Field(ge=1000, le=10000)]
-    anual_interest_rate : int
     monthly_due_date : datetime | None = None
     due_date : datetime | None = None
     

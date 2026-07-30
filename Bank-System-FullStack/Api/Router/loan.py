@@ -18,23 +18,27 @@ async def borrow(
     current_user : Annotated[User, Depends(get_current_user)],
     lender_user : int,
     loan : LoanMoney):
-    if current_user.id == lender_user:
-        raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = "You can not loan from yourself"
-        )
-    data = await borrow_money(database, loan, current_user.id, lender_user)
-    if isinstance(data, str):
-        raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail = data
-        )
-    return {
-        "loan_value" : data.loan_balance,
-        "anual_interest_rate" : data.anual_interest_rate,
-        "monthly_due_date" : data.monthly_due_date,
-        "due_date" : data.due_date
-    }
+    try:
+        if current_user.id == lender_user:
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = "You can not loan from yourself"
+            )
+        data = await borrow_money(database, loan, current_user.id, lender_user)
+        if isinstance(data, str):
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = data
+            )
+        return {
+            "loan_value" : data.loan_balance,
+            "anual_interest_rate" : data.anual_interest_rate,
+            "monthly_due_date" : data.monthly_due_date,
+            "due_date" : data.due_date
+        }
+    except ValueError:
+        await database.rollback()
+        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
 
 
 @router.post("/pay", response_model = LoanPay)
@@ -90,7 +94,7 @@ async def activate_lender(
         if not data:
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
-                detail = "Insuficient balance"
+                detail = "Insufficient balance"
             )
         return {"status" : "success"}
 
