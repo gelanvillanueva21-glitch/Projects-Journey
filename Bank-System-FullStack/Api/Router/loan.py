@@ -36,7 +36,12 @@ async def borrow(
                 detail = data
             )
         print("Computer Science")
-        return data
+        return {
+            "loan_value" : data.loan_balance,
+            "anual_interest_rate" : data.anual_interest_rate,
+            "monthly_due_date" : data.monthly_due_date,
+            "due_date" : data.due_date
+        }
     raise HTTPException(
         status_code = status.HTTP_401_UNAUTHORIZED,
         detail = "Unauthorized data trying to access database"
@@ -56,8 +61,12 @@ async def loan_payment(
                 status_code = status.HTTP_403_FORBIDDEN,
                 detail = "You can not pay or loan your own Account"
             )
+        if current_user.available_balance < payment_info.paid_amount:
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = "Insuficient balance to pay"
+            )
         result = verify_hmac(str(lender_user), signature)
-        print(result)
         if not result:
             raise HTTPException(
                 status_code = status.HTTP_401_UNAUTHORIZED,

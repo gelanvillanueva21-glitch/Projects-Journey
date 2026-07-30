@@ -63,7 +63,7 @@ class LoanPayment(Base):
     __tablename__ = "loanpayment"
     
     id : Mapped[int] = mapped_column(primary_key = True)
-    deptor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
+    debtor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     lender_id : Mapped[int]
     paid_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
@@ -78,7 +78,7 @@ class LoanHistory(Base):
     __tablename__ = "loan_archive"
     
     id : Mapped[int] = mapped_column(primary_key = True)
-    deptor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
+    debtor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     lender_id : Mapped[int]
     paid_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
