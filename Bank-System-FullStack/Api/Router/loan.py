@@ -6,8 +6,6 @@ from Router.authentication import get_current_user, DependencyDatabase
 from schemas import LoanMoney, LoanPay, LoanRespons
 from models import LoanHistory, Loan, LoanPayment, User
 from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan, get_current_loans
-from hmac_auth import verify_hmac
-
 
 
 router = APIRouter(prefix = "/loan", tags = ["loan"])
@@ -19,34 +17,24 @@ async def borrow(
     database : DependencyDatabase,
     current_user : Annotated[User, Depends(get_current_user)],
     lender_user : int,
-    signature : str,
     loan : LoanMoney):
     if current_user.id == lender_user:
         raise HTTPException(
             status_code = status.HTTP_400_BAD_REQUEST,
             detail = "You can not loan from yourself"
         )
-    result = verify_hmac(str(lender_user), signature)
-    print(result)
-    if result:
-        data = await borrow_money(database, loan, current_user.id, lender_user)
-        if isinstance(data, str):
-            raise HTTPException(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                detail = data
-            )
-        print("Computer Science")
-        return {
-            "loan_value" : data.loan_balance,
-            "anual_interest_rate" : data.anual_interest_rate,
-            "monthly_due_date" : data.monthly_due_date,
-            "due_date" : data.due_date
-        }
-    raise HTTPException(
-        status_code = status.HTTP_401_UNAUTHORIZED,
-        detail = "Unauthorized data trying to access database"
-    )
-
+    data = await borrow_money(database, loan, current_user.id, lender_user)
+    if isinstance(data, str):
+        raise HTTPException(
+            status_code = status.HTTP_400_BAD_REQUEST,
+            detail = data
+        )
+    return {
+        "loan_value" : data.loan_balance,
+        "anual_interest_rate" : data.anual_interest_rate,
+        "monthly_due_date" : data.monthly_due_date,
+        "due_date" : data.due_date
+    }
 
 
 @router.post("/pay", response_model = LoanPay)
@@ -54,7 +42,6 @@ async def loan_payment(
     database : DependencyDatabase,
     payment_info : LoanPay,
     lender_user : int,
-    signature : str,
     current_user : Annotated[User, Depends(get_current_user)]):
         if current_user.id == lender_user:
             raise HTTPException(
@@ -65,12 +52,6 @@ async def loan_payment(
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
                 detail = "Insuficient balance to pay"
-            )
-        result = verify_hmac(str(lender_user), signature)
-        if not result:
-            raise HTTPException(
-                status_code = status.HTTP_401_UNAUTHORIZED,
-                detail = "Unauthorized data trying to access database"
             )
         data = await payment(
             database, 

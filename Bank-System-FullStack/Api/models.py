@@ -46,7 +46,7 @@ class Loan(Base):
     
     id : Mapped[int] = mapped_column(primary_key = True)
     debtor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
-    lender_id : Mapped[int]
+    lender_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     loaned_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = False),
         server_default = func.now())
@@ -64,7 +64,7 @@ class LoanPayment(Base):
     
     id : Mapped[int] = mapped_column(primary_key = True)
     debtor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
-    lender_id : Mapped[int]
+    lender_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     paid_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
         server_default = func.now())
@@ -79,7 +79,7 @@ class LoanHistory(Base):
     
     id : Mapped[int] = mapped_column(primary_key = True)
     debtor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
-    lender_id : Mapped[int]
+    lender_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     paid_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = True),
         server_default = func.now())

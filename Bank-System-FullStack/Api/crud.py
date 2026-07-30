@@ -3,8 +3,8 @@ from sqlalchemy import select, update, delete
 from models import User, Loan, LoanPayment, Withdraw, Deposit, LoanHistory
 from schemas import CreateUser, LoanMoney, LoanPay
 from datetime import datetime, timezone, timedelta
+from dateutil.relativedelta import relativedelta
 from auth import hash_password, verify_password
-from hmac_auth import create_hmac
 
 
 # A function that gets an info in database table using email
@@ -95,7 +95,7 @@ async def payment(
         data = await check_loaned_exist(database, debtor_id, lender_id)
         if not data:
             return "Loan did not exist"
-        if not await check_due_date(database, debtor_id, lender_id):
+        if not is_overdue(data.due_date if data.due_date else data.monthly_due_date):
             await increament_interest_rate(database, debtor_id, lender_id)
             await database.refresh(data)
             data.loan_balance = anual_interest_calculation(data.loan_balance, data.anual_interest_rate)
@@ -115,6 +115,7 @@ async def payment(
                     lender_id = lender_id,
                     paid_amount = user_payment.paid_amount
                 )
+                data.monthly_due_date = data.monthly_due_date + relativedelta(months=1)
         if data.due_date:
             if user_payment.paid_amount == data.loan_balance:
                 payment = LoanPayment(
@@ -234,8 +235,7 @@ async def get_available_lenders(database : AsyncSession):
                 "name" : info.name,
                 "amount_lend" : info.amount_lend,
                 "is_active" : info.is_active,
-                "anual_interest_rate" : info.anual_interest_rate,
-                "signature" : create_hmac(str(info.id).encode("utf-8"))
+                "anual_interest_rate" : info.anual_interest_rate
             })
     return output_list
 
@@ -256,8 +256,7 @@ async def get_current_loans(
                     "lender_id" : info.lender_id,
                     "loaned_date" : info.loaned_date,
                     "pay_date" : info.due_date if info.due_date is not None else info.monthly_due_date,
-                    "loan_balance" : info.loan_balance,
-                    "signature" : create_hmac(str(info.lender_id).encode("utf-8"))
+                    "loan_balance" : info.loan_balance
                 })
         return output_list
 
@@ -388,30 +387,10 @@ async def check_loaned_exist(
 
 # A helpder function to check if the due date
 # is already passed
-async def check_due_date(
-    database : AsyncSession,
-    debtor_id : int,
-    lender_id : int) -> bool:
-        result = await database.execute(select(Loan).where(
-            Loan.debtor_id == debtor_id,
-            Loan.lender_id == lender_id))
-        data = result.scalar_one_or_none()
-        
-        if data.monthly_due_date:
-            due_date = data.monthly_due_date
-            if due_date.tzinfo is None:
-                due_date = due_date.replace(tzinfo=timezone.utc)
-            month = datetime.now().month
-            day = datetime.now().day
-            return due_date.day >= day and due_date.month >= month
-        
-        if data.due_date:
-            due_date = data.due_date
-            if due_date.tzinfo is None:
-                due_date = due_date.replace(tzinfo=timezone.utc)
-            date_now = datetime.now(timezone.utc)
-            return due_date > date_now
-        raise ValueError("Both payment method is None")
+def is_overdue(due_date : datetime) -> bool:
+    if due_date.tzinfo is None:
+        due_date = due_date.replace(tzinfo=timezone.utc)
+    return datetime.now(timezone.utc) > due_date
 
 
 
