@@ -67,8 +67,11 @@ async def loan_payment(
                 status_code = status.HTTP_400_BAD_REQUEST,
                 detail = data if data else "Insufficient amount"
             )
+<<<<<<< HEAD
         await database.commit()
         await database.refresh(data)
+=======
+>>>>>>> 7aa0441b5685b7aadc910a44ca6db8dcd85d7d14
         if isinstance(data, list):
             response_data = data[0]
             return {

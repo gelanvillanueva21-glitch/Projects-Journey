@@ -113,6 +113,11 @@ async def payment(
                 data.due_date = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=5)
             else:
                 data.monthly_due_date = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=5)
+<<<<<<< HEAD
+=======
+            await database.commit()
+            await database.refresh(data)
+>>>>>>> 7aa0441b5685b7aadc910a44ca6db8dcd85d7d14
             return [data, "Your payment is past due. A 1 percent late fee has been applied to your total."]
         is_accepted = False
         payment = None
