@@ -60,8 +60,12 @@ class Loan(Base):
     loaned_date : Mapped[datetime] = mapped_column(
         DateTime(timezone = False),
         server_default = func.now())
-    due_date : Mapped[datetime | None] = mapped_column(default = None)
-    monthly_due_date : Mapped[datetime | None] = mapped_column(default = None)
+    due_date : Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        default = None)
+    monthly_due_date : Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        default = None)
     monthly_pay : Mapped[int] = mapped_column(default = 12)
     loan_balance : Mapped[int]
     anual_interest_rate : Mapped[int]

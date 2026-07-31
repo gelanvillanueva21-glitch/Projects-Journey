@@ -5,7 +5,7 @@ from typing import Annotated
 from Router.authentication import get_current_user, DependencyDatabase
 from schemas import LoanMoney, LoanPay, LoanRespons
 from models import LoanHistory, Loan, LoanPayment, User
-from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan, get_current_loans, reset_lend_amount, reset_interest_rate, get_debtor_loan
+from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan, get_current_loans, get_debtor_loan
 
 
 router = APIRouter(prefix = "/loan", tags = ["loan"])
@@ -41,7 +41,7 @@ async def borrow(
         raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
 
 
-@router.post("/pay", response_model = LoanPay)
+@router.post("/pay")
 async def loan_payment(
     database : DependencyDatabase,
     payment_info : LoanPay,
@@ -65,46 +65,17 @@ async def loan_payment(
         if isinstance(data, str) or data is None:
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
-                detail = data if data else "Error occured during payment"
+                detail = data if data else "Insufficient amount"
             )
+        if isinstance(data, list):
+            response_data = data[0]
+            return {
+                "status" : data[1],
+                "new_amount" : response_data.loan_balance
+            }
         return {"paid_amount" : data.paid_amount}
 
 
-
-
-
-@router.post("/reset_lender")
-async def reset_lend(
-    database : DependencyDatabase,
-    current_user : Annotated[User, Depends(get_current_user)]):
-        try:
-            data = await reset_lend_amount(database, current_user.id)
-            await database.commit(data)
-            return {"status" : "success"}
-        except Exception:
-            await database.rollback()
-            raise HTTPException(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                detail = "Unexpected error occured"
-            )
-
-
-
-
-@router.post("/reset_interest")
-async def reset_interest(
-    database : DependencyDatabase,
-    current_user : Annotated[User, Depends(get_current_user)]):
-        try:
-            data = await reset_interest_rate(database, current_user.id)
-            if not data:
-                raise HTTPException(
-                    status_code = status.HTTP_400_BAD_REQUEST,
-                    detail = "Can not reset interest, Users who loaned must pay first"
-                )
-        except Exception:
-            await database.rollback()
-            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
 
 
 
