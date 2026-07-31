@@ -20,7 +20,6 @@ async def create_user(
     user_data : CreateUser):
         try:
             email_exist = await get_user_email(database, user_data.email)
-            print("Computer Science")
             if email_exist:
                 print(email_exist)
                 raise HTTPException(
@@ -28,7 +27,6 @@ async def create_user(
                     detail = "Email already registered"
                 )
             data = await create_user_account(database, user_data)
-            print("Sayonara")
             return data
         except IntegrityError:
             await database.rollback()
@@ -80,7 +78,11 @@ async def get_info(current_user_info : Annotated[
 async def get_user_balance(
     database : DependencyDatabase,
     current_user : Annotated[User, Depends(get_current_user)]):
-        return await get_balance(database, current_user.id)
+        data = await get_balance(database, current_user.id)
+        return {
+            "status" : "success",
+            "balance" : data
+        }
 
 
 

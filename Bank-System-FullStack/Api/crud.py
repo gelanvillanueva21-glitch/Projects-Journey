@@ -12,7 +12,6 @@ async def get_user_email(
     database : AsyncSession,
     email : str
 ) -> User:
-        print("Hello World")
         data = await database.execute(select(User).where(
             User.email == email))
         return data.scalar_one_or_none()
@@ -66,12 +65,12 @@ async def borrow_money(
         try:
             result = await check_loaned_exist(database, debtor_id, lender_id)
             lender_data = await is_lender_exist(database, lender_id)
+            if not lender_data:
+                return "Lender does not exist"
             if not await is_lender_can_lend(database, lender_id):
                 return "Lender is not available"
             if await is_lender_enough_balance(database, lender_id, loan.loan_value):
                 return "Lender balance insufficient"
-            if not lender_data:
-                return "Lender does not exist"
             if result:
                 return "You have not fully paid yet"
             if await is_loaned_limit(database, debtor_id):
@@ -123,13 +122,14 @@ async def payment(
         is_accepted = False
         payment = None
         if data.monthly_due_date:
-            if user_payment.paid_amount == (data.loan_balance // 12):
+            if user_payment.paid_amount == (data.loan_balance // data.monthly_pay):
                 payment = LoanPayment(
                     debtor_id = debtor_id,
                     lender_id = lender_id,
                     paid_amount = user_payment.paid_amount
                 )
                 data.monthly_due_date = data.monthly_due_date + relativedelta(months=1)
+                data.monthly_pay -= 1
                 is_accepted = True
         if data.due_date:
             if user_payment.paid_amount == data.loan_balance:
@@ -141,9 +141,7 @@ async def payment(
                 is_accepted = True
         if is_accepted:
             loan_info = await decreas_amount(database, data, user_payment.paid_amount, debtor_id, lender_id)
-            result = await check_loan_balance(database, loan_info, debtor_id, lender_id)
-        if not result:
-            return None
+            await check_loan_balance(database, loan_info, debtor_id, lender_id)
         if payment is not None:
             database.add(payment)
             await database.commit()
@@ -162,7 +160,6 @@ async def active_lend(
     if not data:
         return False
     data.can_lend = True
-    await database.commit()
     return True
 
 
@@ -174,13 +171,45 @@ async def deactive_lend(
     data = await database.get(User, id)
     if not data:
         return None
+    result = await database.execute(select(Loan).where(Loan.lender_id == id))
+    data_response = result.scalars().all()
     if data.can_lend:
         data.can_lend = False
         data.available_balance += data.amount_lend
         data.amount_lend = 0
         await database.commit()
         return True
-    return False
+    return None
+
+
+
+
+# A function that reset the lend amount to send it back 
+# to the balance of user
+async def reset_lend_amount(
+    database : AsyncSession,
+    user_id : int):
+    data = await database.get(User, user_id)
+    data.available_balance += data.amount_lend
+    data.amount_lend = 0
+    return data
+
+
+
+
+# A function to reset the interest rate
+async def reset_interest_rate(
+    database : AsyncSession,
+    user_id : int):
+    data = await database.execute(select(Loan).where(Loan.lender_id == user_id))
+    data_response = data.scalars().all()
+    if len(data_response) == 0:
+        user_data = await database.get(User, user_id)
+        user_data.anual_interest_rate = 0
+        await database.commit()
+        return user_data
+    return None
+
 
 
 
@@ -194,11 +223,10 @@ async def lend_amount(
     data = await database.get(User, id)
     if data.can_lend:
         if amount > 100 and amount < 10000 and data.available_balance > amount:
-            data.anual_interest_rate += interest
+            if data.anual_interest_rate == 0:
+                data.anual_interest_rate += interest
             data.amount_lend += amount
             data.available_balance -= amount
-            await database.commit()
-            await database.refresh(data)
             return data
     return None
 
@@ -233,6 +261,17 @@ async def get_archived_loan(
                     "date" : info.paid_date
                 })
         return output_list
+
+
+
+
+
+# A function to get the users who borrowed money from current user
+async def get_debtor_loan(
+    database : AsyncSession,
+    user_id : int):
+    data = await database.execute(select(Loan).where(Loan.lender == user_id))
+    return data.scalars().all()
 
 
 
@@ -420,7 +459,7 @@ def anual_interest_calculation(
     anual_interest_rate : int):
         total_payment = loan_amount
         interest_rate = anual_interest_rate
-        return (total_payment * (1 + interest_rate / 100))
+        return int(total_payment * (1 + interest_rate / 100))
 
 
 
@@ -522,17 +561,12 @@ async def helper_borrow_function(
     user_id : int,
     lender_id : int,
     amount : int):
-    
-    try:
         user_data = await database.get(User, user_id)
         lender_data = await database.get(User, lender_id)
         if lender_data.amount_lend < amount:
             raise ValueError("Error occured during calculation amount balance")
         user_data.available_balance += amount
         lender_data.amount_lend -= amount
-    except Exception:
-        await database.rollback()
-        raise ValueError("Error occured during calculation amount balance")
     
 
 
@@ -555,7 +589,7 @@ async def is_lender_enough_balance(
     lender_id : int,
     amount : int) -> bool:
         data = await database.get(User, lender_id)
-        return data.amount_lend < amount
+        return data.amount_lend > amount
 
 
 

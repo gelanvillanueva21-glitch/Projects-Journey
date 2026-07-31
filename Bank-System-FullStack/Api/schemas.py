@@ -16,6 +16,7 @@ class CreateUser(UserBase):
 
 
 class UserResponse(BaseModel):
+    id : int
     name : str
     is_active : Annotated[bool, Field(default = True)]
     available_balance : int

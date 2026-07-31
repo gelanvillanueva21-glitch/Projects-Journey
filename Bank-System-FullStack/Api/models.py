@@ -14,8 +14,6 @@ class User(Base):
     name : Mapped[str] = mapped_column(String(155))
     is_active : Mapped[bool] = mapped_column(default = True)
     can_lend : Mapped[bool] = mapped_column(default = False)
-    monthly_payment_amount : Mapped[int] = mapped_column(default = 30)
-    due_date : Mapped[datetime | None] = mapped_column(default = None)
     anual_interest_rate : Mapped[int] = mapped_column(default = 0)
     amount_lend : Mapped[int] = mapped_column(default = 0)
     created_at : Mapped[datetime] = mapped_column(
@@ -64,6 +62,7 @@ class Loan(Base):
         server_default = func.now())
     due_date : Mapped[datetime | None] = mapped_column(default = None)
     monthly_due_date : Mapped[datetime | None] = mapped_column(default = None)
+    monthly_pay : Mapped[int] = mapped_column(default = 12)
     loan_balance : Mapped[int]
     anual_interest_rate : Mapped[int]
     

@@ -5,7 +5,7 @@ from typing import Annotated
 from Router.authentication import get_current_user, DependencyDatabase
 from schemas import LoanMoney, LoanPay, LoanRespons
 from models import LoanHistory, Loan, LoanPayment, User
-from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan, get_current_loans
+from crud import get_archived_loan, borrow_money, payment, active_lend, lend_amount, get_available_lenders, deactive_lend, delete_archive_loan, get_current_loans, reset_lend_amount, reset_interest_rate, get_debtor_loan
 
 
 router = APIRouter(prefix = "/loan", tags = ["loan"])
@@ -73,6 +73,39 @@ async def loan_payment(
 
 
 
+@router.post("/reset_lender")
+async def reset_lend(
+    database : DependencyDatabase,
+    current_user : Annotated[User, Depends(get_current_user)]):
+        try:
+            data = await reset_lend_amount(database, current_user.id)
+            await database.commit(data)
+            return {"status" : "success"}
+        except Exception:
+            await database.rollback()
+            raise HTTPException(
+                status_code = status.HTTP_400_BAD_REQUEST,
+                detail = "Unexpected error occured"
+            )
+
+
+
+
+@router.post("/reset_interest")
+async def reset_interest(
+    database : DependencyDatabase,
+    current_user : Annotated[User, Depends(get_current_user)]):
+        try:
+            data = await reset_interest_rate(database, current_user.id)
+            if not data:
+                raise HTTPException(
+                    status_code = status.HTTP_400_BAD_REQUEST,
+                    detail = "Can not reset interest, Users who loaned must pay first"
+                )
+        except Exception:
+            await database.rollback()
+            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+
 
 
 
@@ -82,21 +115,29 @@ async def activate_lender(
     amount : Annotated[int, Query(ge=1000, le=10000)],
     interest_rate : Annotated[int, Query(ge=3, le=15)],
     current_user : Annotated[User, Depends(get_current_user)]):
-        if current_user.can_lend:
-            raise HTTPException(
-                status_code = status.HTTP_403_FORBIDDEN,
-                detail = "Lender already activate"
-            )
-        result = await active_lend(database, current_user.id)
-        if not result:
-            raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
-        data = await lend_amount(database, current_user.id, amount, interest_rate)
-        if not data:
+        try:
+            if current_user.can_lend:
+                raise HTTPException(
+                    status_code = status.HTTP_403_FORBIDDEN,
+                    detail = "Lender already activate"
+                )
+            result = await active_lend(database, current_user.id)
+            if not result:
+                raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST)
+            data = await lend_amount(database, current_user.id, amount, interest_rate)
+            if not data:
+                raise HTTPException(
+                    status_code = status.HTTP_400_BAD_REQUEST,
+                    detail = "Insufficient balance"
+                )
+            await database.commit()
+            return {"status" : "success"}
+        except Exception:
+            await database.rollback()
             raise HTTPException(
                 status_code = status.HTTP_400_BAD_REQUEST,
-                detail = "Insufficient balance"
+                detail = "Unexpected error occured"
             )
-        return {"status" : "success"}
 
 
 
@@ -109,6 +150,24 @@ async def deactivate_lender(
         if not result:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
         return {"status" : "success"}
+
+
+
+
+@router.get("/debtor")
+async def get_debtor(
+    database : DependencyDatabase,
+    current_user : Annotated[User, Depends(get_current_user)]):
+        try:
+            data = await get_debtor_loan(database, current_user.id)
+            return {
+                "status" : "success",
+                "data" : data
+            }
+        except Exception:
+            raise HTTPException(
+                status_code = status.HTTP_404_NOT_FOUND
+            )
 
 
 

@@ -25,7 +25,7 @@ async def login(
     user_data : Annotated[OAuth2PasswordRequestForm, Depends()],
     database : DependencyDatabase):
         user = await get_user_email(database, user_data.username)
-        if not user and not verify_password(user_data.password, user.hashed_password):
+        if not user or not verify_password(user_data.password, user.hashed_password):
             raise HTTPException(
                 status_code = status.HTTP_401_UNAUTHORIZED,
                 detail = "Incorrect email or password"
