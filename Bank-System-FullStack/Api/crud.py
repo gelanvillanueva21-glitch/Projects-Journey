@@ -61,38 +61,31 @@ async def borrow_money(
     debtor_id : int,
     lender_id : int
 ) -> Loan | str:
-    
-        try:
-            result = await check_loaned_exist(database, debtor_id, lender_id)
-            lender_data = await is_lender_exist(database, lender_id)
-            if not lender_data:
-                return "Lender does not exist"
-            if not await is_lender_can_lend(database, lender_id):
-                return "Lender is not available"
-            if not await is_lender_enough_balance(database, lender_id, loan.loan_value):
-                return "Lender balance insufficient"
-            if result:
-                return "You have not fully paid yet"
-            if await is_loaned_limit(database, debtor_id):
-                return "Loan has reach to its maximum"
+        result = await check_loaned_exist(database, debtor_id, lender_id)
+        lender_data = await is_lender_exist(database, lender_id)
+        if not lender_data:
+            return "Lender does not exist"
+        if not await is_lender_can_lend(database, lender_id):
+            return "Lender is not available"
+        if not await is_lender_enough_balance(database,lender_id, loan.loan_value):
+            return "Lender balance insufficient"
+        if result:
+            return "You have not fully paid yet"
+        if await is_loaned_limit(database, debtor_id):
+            return "Loan has reach to its maximum"
             
-            total_amount = anual_interest_calculation(loan.loan_value, lender_data.anual_interest_rate)
-            borrowed_data = Loan(
-                debtor_id = debtor_id,
-                lender_id = lender_id,
-                due_date = loan.due_date,
-                monthly_due_date = loan.monthly_due_date,
-                loan_balance = total_amount,
-                anual_interest_rate = lender_data.anual_interest_rate
-            )
-            await helper_borrow_function(database, debtor_id, lender_id, loan.loan_value)
-            database.add(borrowed_data)
-            await database.commit()
-            await database.refresh(borrowed_data)
-            return borrowed_data
-        except Exception:
-            await database.rollback()
-            raise ValueError("Unexpected Error")
+        total_amount = anual_interest_calculation(loan.loan_value, lender_data.anual_interest_rate)
+        borrowed_data = Loan(
+            debtor_id = debtor_id,
+            lender_id = lender_id,
+            due_date = loan.due_date,
+            monthly_due_date = loan.monthly_due_date,
+            loan_balance = total_amount,
+            anual_interest_rate = lender_data.anual_interest_rate
+        )
+        await helper_borrow_function(database, debtor_id, lender_id, loan.loan_value)
+        database.add(borrowed_data)
+        return borrowed_data
 
 
 
@@ -113,11 +106,8 @@ async def payment(
                 data.due_date = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=5)
             else:
                 data.monthly_due_date = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(days=5)
-<<<<<<< HEAD
-=======
             await database.commit()
             await database.refresh(data)
->>>>>>> 7aa0441b5685b7aadc910a44ca6db8dcd85d7d14
             return [data, "Your payment is past due. A 1 percent late fee has been applied to your total."]
         is_accepted = False
         payment = None
@@ -445,23 +435,6 @@ def anual_interest_calculation(
 
 
 
-# A helper function to increament the interest rate if the
-# due date of the payment is passed
-async def increament_interest_rate(
-    database : AsyncSession,
-    debtor_id : int,
-    lender_id : int):
-        increament_interest = await database.execute(
-            update(Loan)
-            .where(
-                Loan.debtor_id == debtor_id,
-                Loan.lender_id == lender_id
-            ).values(anual_interest_rate = Loan.anual_interest_rate + 1)
-        )
-        await database.commit()
-
-
-
 # A helper function to decreas total amount of loan
 async def decreas_amount(
     database : AsyncSession,
@@ -469,7 +442,6 @@ async def decreas_amount(
     amount : int,
     user_id : int,
     lender_id : int):
-    try:
         if loan:
             user_data = await database.get(User, user_id)
             lender_data = await database.get(User, lender_id)
@@ -482,9 +454,6 @@ async def decreas_amount(
                 lender_data.available_balance += amount
             loan.loan_balance -= amount
             return loan
-    except Exception:
-        await database.rollback()
-        raise ValueError("Error occured during calculation")
 
 
 

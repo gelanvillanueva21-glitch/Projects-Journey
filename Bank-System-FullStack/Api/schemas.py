@@ -61,7 +61,7 @@ class LoanMoney(BaseModel):
 
 
 
-class LoanRespons(LoanMoney):
+class LoanResponse(LoanMoney):
     model_config = ConfigDict(from_attributes = True)
 
 

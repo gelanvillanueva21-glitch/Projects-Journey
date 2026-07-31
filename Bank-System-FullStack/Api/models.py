@@ -22,7 +22,7 @@ class User(Base):
     available_balance : Mapped[int] = mapped_column(default = 0)
     
     loans : Mapped[list["Loan"]] = relationship(
-        back_populates = "deptor_owner", 
+        back_populates = "debtor_owner", 
         cascade = "all, delete-orphan",
         foreign_keys = "[Loan.debtor_id]")
     lender : Mapped[list["Loan"]] = relationship(
@@ -58,7 +58,7 @@ class Loan(Base):
     debtor_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     lender_id : Mapped[int] = mapped_column(ForeignKey("users.id"))
     loaned_date : Mapped[datetime] = mapped_column(
-        DateTime(timezone = False),
+        DateTime(timezone = True),
         server_default = func.now())
     due_date : Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
@@ -70,7 +70,7 @@ class Loan(Base):
     loan_balance : Mapped[int]
     anual_interest_rate : Mapped[int]
     
-    deptor_owner : Mapped["User"] = relationship(
+    debtor_owner : Mapped["User"] = relationship(
         back_populates = "loans",
         foreign_keys = [debtor_id])
     lender_owner : Mapped["User"] = relationship(

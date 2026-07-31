@@ -1,0 +1,229 @@
+================================================================================
+                        GIT CHEAT SHEET — BANK SYSTEM PROJECT
+                        Copy this to your text pad. Read it when stuck.
+================================================================================
+
+================================================================================
+PHASE 0: SETUP (One time per machine)
+================================================================================
+
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+git config --global init.defaultBranch main
+git config --global core.editor "code --wait"     # VS Code as editor
+git config --global merge.tool vscode
+git config --global mergetool.vscode.cmd "code --wait $MERGED"
+
+# Check your settings
+git config --list
+
+================================================================================
+PHASE 1: DAILY WORKFLOW (90% of your life)
+================================================================================
+
+# 1. Start working
+git checkout -b feature/login-form        # Create and switch to branch
+git branch -m feature/login-form          # Rename current branch
+
+# 2. Do work... then check what changed
+git status                                # What files changed?
+git diff                                  # What exactly changed in code?
+git diff --staged                         # What is already added to commit?
+
+# 3. Save your work
+git add .                                 # Stage all changes
+git add src/components/Login.tsx            # Stage one file
+git reset HEAD src/components/Login.tsx     # Unstage that file
+
+git commit -m "feat: add login form validation"
+# Rule: commit message = imperative verb + what + why (keep under 72 chars)
+
+# 4. Sync with remote
+git pull origin main                      # Get latest changes first
+git push -u origin feature/login-form     # Push branch to GitHub (-u = track)
+
+# 5. When done, merge via Pull Request on GitHub. NEVER push directly to main.
+
+================================================================================
+PHASE 2: UNDOING MISTAKES (Before you panic)
+================================================================================
+
+SCENARIO A: You edited a file but haven't staged it yet
+    git checkout -- filename.tsx            # Discard changes in ONE file
+    git checkout -- .                       # Discard changes in ALL files
+    # OR safer: git restore filename.tsx
+
+SCENARIO B: You staged a file but haven't committed
+    git reset HEAD filename.tsx            # Unstage file (keep changes)
+    git checkout -- filename.tsx             # Then discard changes if needed
+
+SCENARIO C: You committed but haven't pushed yet
+    git commit --amend -m "new message"     # Fix last commit message
+    git reset --soft HEAD~1                 # Undo last commit, keep changes staged
+    git reset --mixed HEAD~1                # Undo last commit, keep changes unstaged
+    git reset --hard HEAD~1                 # DESTROY last commit forever (careful!)
+
+SCENARIO D: You pushed a bad commit to remote
+    git revert HEAD                         # Creates a NEW commit that undoes the last one
+    git push origin feature/login-form      # Push the revert. Safe for shared history.
+
+SCENARIO E: You committed to main by accident
+    git checkout main
+    git reset --soft HEAD~1                 # Undo commit, keep changes
+    git checkout -b feature/your-branch     # Move changes to new branch
+    git checkout main
+    git reset --hard origin/main            # Reset main to match remote
+
+================================================================================
+PHASE 3: MERGE CONFLICTS (The scary part, but easy if you follow steps)
+================================================================================
+
+STEP 1: You see this after `git pull` or `git merge`
+    "CONFLICT (content): Merge conflict in src/App.tsx"
+    "Automatic merge failed; fix conflicts and then commit the result."
+
+STEP 2: Find all conflicted files
+    git status
+    # Look for "Unmerged paths" or "both modified"
+
+STEP 3: Open the file. Look for these markers:
+    <<<<<<< HEAD
+    // Your current branch's code
+    =======
+    // Code coming from the other branch
+    >>>>>>> feature/login-form
+
+STEP 4: Decide what stays. Delete the markers.
+    # Option A: Keep yours
+    // Your current branch's code
+
+    # Option B: Keep theirs
+    // Code coming from the other branch
+
+    # Option C: Combine both manually
+    // Your code + Their code merged together
+
+STEP 5: Mark as resolved
+    git add src/App.tsx                     # Tell git "I fixed this file"
+
+STEP 6: Finish the merge
+    git commit -m "merge: resolve conflict in App.tsx"
+    # OR if it was a pull:
+    git push origin your-branch
+
+STEP 7: If you want to abort the merge entirely
+    git merge --abort                       # Go back to before the merge started
+
+================================================================================
+PHASE 4: WHEN THINGS BREAK / RECOVERY
+================================================================================
+
+ERROR: "fatal: not a git repository"
+    FIX: cd into your project folder. You are in the wrong directory.
+
+ERROR: "failed to push some refs"
+    FIX: Someone pushed before you.
+        git pull origin main --rebase       # Put your commits on top of theirs
+        # Fix any conflicts, then:
+        git push origin your-branch
+
+ERROR: "Please commit or stash your changes before merge"
+    FIX: You have uncommitted work and need to switch branches.
+        git stash push -m "WIP: login form" # Save work temporarily
+        git checkout main
+        # ... do stuff ...
+        git checkout feature/login-form
+        git stash pop                       # Restore your work
+
+ERROR: "Your branch and origin/main have diverged"
+    FIX:
+        git fetch origin                    # Download latest info
+        git rebase origin/main              # Replay your commits on top of main
+        # OR if you don't understand rebase yet:
+        git pull origin main                # Creates a merge commit. Safer for beginners.
+
+ERROR: "cannot lock ref 'refs/heads/feature/...' "
+    FIX: Git is confused. Usually another git process is running.
+        rm -f .git/index.lock              # Delete the lock file
+        # Then retry your command.
+
+ERROR: "fatal: refusing to merge unrelated histories"
+    FIX: You initialized a local repo and tried to pull from a remote with different history.
+        git pull origin main --allow-unrelated-histories
+
+ERROR: "I deleted a file by accident and committed"
+    FIX:
+        git log --diff-filter=D --summary    # Find the commit where you deleted it
+        git checkout <commit-hash>^ -- path/to/file   # Restore it
+
+ERROR: "My repo feels corrupt"
+    FIX:
+        git fsck                              # Check for corruption
+        git reflog                            # See every move you made (recovery superpower)
+        git reset --hard HEAD@{2}             # Go back 2 steps in reflog
+
+================================================================================
+PHASE 5: GITHUB FLOW (How real teams work)
+================================================================================
+
+1. main branch is ALWAYS deployable.
+2. Create a branch: git checkout -b feature/description
+3. Make small, focused commits.
+4. Push branch: git push -u origin feature/description
+5. Open Pull Request on GitHub.
+6. Code review (even if you review yourself).
+7. Merge to main ONLY after tests pass.
+8. Delete the branch after merge.
+9. Pull latest main: git checkout main && git pull origin main
+
+================================================================================
+PHASE 6: USEFUL SHORTCUTS
+================================================================================
+
+git log --oneline --graph --all             # Pretty history view
+git branch -a                               # List all branches (local + remote)
+git branch -d feature/login-form            # Delete local branch after merge
+git push origin --delete feature/login-form # Delete remote branch
+git stash list                              # See all stashed work
+git stash drop stash@{0}                    # Delete a specific stash
+git cherry-pick <commit-hash>               # Copy ONE commit from another branch
+git tag v1.0.0                              # Mark a release version
+git push origin v1.0.0                      # Push tag to GitHub
+
+================================================================================
+PHASE 7: THE GOLDEN RULES (Read this every morning)
+================================================================================
+
+1. NEVER git push --force to main. You will destroy your team's work.
+2. NEVER git reset --hard if you haven't committed or stashed.
+3. ALWAYS pull before you push.
+4. ALWAYS create a branch for new work. Never code directly on main.
+5. Commit messages matter. "fix stuff" is useless. "fix: prevent negative balance on withdrawal" is gold.
+6. If you are scared of losing work: git stash or git commit. You can always undo a commit.
+7. When in doubt: git status. It tells you exactly what to do next.
+
+================================================================================
+EMERGENCY PHONE NUMBERS (Commands that save your life)
+================================================================================
+
+"I broke everything and want to start over from remote"
+    git fetch origin
+    git reset --hard origin/main
+
+"I committed sensitive data (password, API key)"
+    git rm --cached filename.env
+    echo "filename.env" >> .gitignore
+    git commit -m "remove sensitive file"
+    # Then change the password/key because git history still has it.
+
+"I need to see what I did 10 minutes ago"
+    git reflog
+
+"I want to ignore node_modules forever"
+    echo "node_modules/" >> .gitignore
+    echo ".env" >> .gitignore
+    git add .gitignore && git commit -m "chore: update gitignore"
+
+================================================================================
+EOF — Save this file as git-cheatsheet.txt and keep it open while coding.
+================================================================================
