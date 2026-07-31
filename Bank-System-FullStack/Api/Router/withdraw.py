@@ -57,6 +57,7 @@ async def delete_withdraw_history(
                 status_code = status.HTTP_400_BAD_REQUEST,
                 detail = "Withdraw history empty"
             )
+        return {"status" : "success"}
 
 
 
