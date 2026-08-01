@@ -38,15 +38,13 @@ interface User { id: number; name: string };
 interface Product { sku: string; price: number };
 
 
-const loadingUserData: ApiResponse<User> = { status: "loading" };
 const productData: ApiResponse<Product> = { status: "success", data: { sku: "jk141dabW141", price: 120 } };
-const errorData: ApiResponse<User> = { status: "error", error: "Internet  connection cut off"};
 const userData: ApiResponse<User> = { status: "success", data: { id: 120412, name: "John Cena" }};
 
 
-console.log(formatResponse(loadingUserData));
+console.log(formatResponse<User>({ status: "loading"}));
 console.log(formatResponse(productData));
-console.log(formatResponse(errorData));
+console.log(formatResponse<Product>({ status: "error", error: "Internet  connection cut off"}));
 console.log(formatResponse(userData));
 
 
