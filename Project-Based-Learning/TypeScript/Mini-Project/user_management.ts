@@ -3,7 +3,7 @@
 
 interface Employee {
     id: number;
-    fullname: string;
+    fullName: string;
     email: string;
     department: "engineering" | "design" | "marketing";
     salary: number;
@@ -12,27 +12,25 @@ interface Employee {
 }
 
 
-type EmployeeCardsProps = Pick<Employee, "fullname" | "department" | "isActive">
+type EmployeeCardsProps = Pick<Employee,    "fullName" | "department" | "isActive">
 type EmployeeUpdateForm = Partial<Employee>
 type PublickEmployee = Omit<Employee, "accessToken" | "salary">
 
 
 type BooleanFlags<T> = {
-    id: boolean;
-    fullname: boolean;
-    email: boolean;
-    department: boolean;
-    salary: boolean;
-    isActive: boolean;
-    accessToken: boolean;
+    [K in keyof T]: boolean
 }
 
 
 type DepartmentConfig = Record<Employee["department"], {head: string; budget: number}>
 
 
-function createEmployeeCardDate(employee: Employee): EmployeeCardsProps{
-    return employee
+function createEmployeeCardData(employee: Employee): EmployeeCardsProps{
+    return {
+        fullName: employee.fullName,
+        department: employee.department,
+        isActive: employee.isActive
+    }
 }
 
 
@@ -44,7 +42,7 @@ function isEmployeeActive(flags: BooleanFlags<Employee>): boolean{
 
 const employee: Employee = {
     id: 1,
-    fullname: "John Kent",
+    fullName: "John Kent",
     email: "johnkenet@gmail.com",
     department: "engineering",
     salary: 150000,
@@ -53,12 +51,12 @@ const employee: Employee = {
 };
 
 
-console.log(createEmployeeCardDate(employee));
+console.log(createEmployeeCardData(employee));
 
 
 const flags: BooleanFlags<Employee> = {
     id: true,
-    fullname: false,
+    fullName: false,
     email: true,
     department: false,
     salary: true,
