@@ -8,8 +8,8 @@ interface MetricCardProps {
 }
 
 
-function MetricCard({ metric }: MetricCardProps): React.JSX.Element {
-    const change = ((metric.current - metric.previous) / metric.previous) * 100;
+export function MetricCard({ metric }: MetricCardProps): React.JSX.Element {
+    const change = metric.previous === 0 ? 0 : ((metric.current - metric.previous) / metric.previous) * 100;
     const isPositive = change >= 0;
 
     function formatValue(value: number, format: Metric["format"]): string {
@@ -17,7 +17,7 @@ function MetricCard({ metric }: MetricCardProps): React.JSX.Element {
             case "currency":
                 return `$${value.toLocaleString()}`;
             case "percentage":
-                return `${value.toFixed()}%`;
+                return `${value.toFixed(1)}%`;
             case "number":
                 return value.toLocaleString();
             default:
