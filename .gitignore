@@ -9,5 +9,3 @@
 **/__pycache__/
 **/*.pyc
 **.env
-Project-Based-Learning/TypeScript/node_modules
-**.json
