@@ -1,6 +1,6 @@
 
 
-import React from "react";
+import React, { useState } from "react";
 import { MetricCard } from "./MetricCard.js";
 import { PeriodSelector } from "./PeriodSelector.js";
 import type { Metric, Period } from "./types.js";
@@ -22,29 +22,16 @@ const METRICS_DATA: Record<Period, Metric[]> = {
 };
 
 
-const revenueData: Metric = {
-    label: "Total Revenue",
-    current: 125000,
-    previous: 100000,
-    format: "currency"
-}
-
-
-const usersData: Metric = {
-    label: "Active Users",
-    current: 8450,
-    previous: 8000,
-    format: "number"
-}
-
-
 function App(): React.JSX.Element {
+    const [period, setPeriod] = useState<Period>("7d")
     return (
         <div className="dashboard">
             <h1>Analytics Dashboard</h1>
+            <PeriodSelector selected={period} onSelect={setPeriod}/>
             <div className="metrics-grid">
-                <MetricCard metric={revenueData}/>
-                <MetricCard metric={usersData}/>
+                {METRICS_DATA[period].map((metric) => (
+                    <MetricCard key={metric.label} metric={metric}/>
+                ))}
             </div>
         </div>
     );
