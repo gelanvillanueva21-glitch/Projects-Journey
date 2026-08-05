@@ -1,7 +1,7 @@
 
 
 import React from "react";
-import type { Period } from "./types.js";
+import type { Period } from "./types";
 
 
 interface PeriodSelectorProps {
