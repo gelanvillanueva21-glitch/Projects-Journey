@@ -1,0 +1,319 @@
+REACT PROJECT CREATION CHECKLIST
+
+========================================
+1. CREATE THE PROJECT
+========================================
+
+Create a new React + TypeScript project:
+
+npm create vite@latest my-project
+
+Choose:
+
+Framework:
+React
+
+Variant:
+TypeScript
+
+Then:
+
+cd my-project
+
+npm install
+
+
+========================================
+2. CHECK PROJECT STRUCTURE
+========================================
+
+A normal React + Vite project should look like:
+
+my-project/
+
+├── index.html
+├── package.json
+├── vite.config.ts
+├── node_modules/
+└── src/
+    ├── main.tsx
+    ├── App.tsx
+    └── ...
+
+
+Important files:
+
+index.html
+- Contains the root element:
+
+<div id="root"></div>
+
+
+main.tsx
+- Connects React to the HTML:
+
+ReactDOM.createRoot(
+    document.getElementById("root")!
+).render(
+    <App />
+)
+
+
+The id in index.html and main.tsx must match.
+
+
+========================================
+3. RUN THE PROJECT FIRST
+========================================
+
+Before writing code:
+
+npm run dev
+
+
+You should see:
+
+Local: http://localhost:5173/
+
+
+Open the browser and confirm React is working.
+
+
+========================================
+4. CLEAN THE STARTER FILES
+========================================
+
+Remove unnecessary default files if you don't need them:
+
+src/assets
+
+App.css
+
+index.css
+
+
+Create your own structure.
+
+
+========================================
+5. ORGANIZE YOUR PROJECT
+========================================
+
+Recommended structure:
+
+src/
+
+├── components/
+│   ├── Navbar.tsx
+│   ├── Sidebar.tsx
+│   └── Card.tsx
+│
+├── pages/
+│   ├── Home.tsx
+│   └── Dashboard.tsx
+│
+├── hooks/
+│   └── useData.ts
+│
+├── types/
+│   └── index.ts
+│
+├── App.tsx
+├── main.tsx
+└── app.css
+
+
+========================================
+6. INSTALL COMMON PACKAGES
+========================================
+
+Routing:
+
+npm install react-router-dom
+
+
+API requests:
+
+npm install axios
+
+
+Icons:
+
+npm install lucide-react
+
+
+========================================
+7. DON'T MAKE ONE HUGE APP.TSX
+========================================
+
+Avoid:
+
+App.tsx with thousands of lines.
+
+
+Instead:
+
+components/
+
+Navbar.tsx
+
+Card.tsx
+
+Dashboard.tsx
+
+Form.tsx
+
+
+Import components into App.tsx.
+
+
+========================================
+8. USE TYPESCRIPT PROPERLY
+========================================
+
+Create types:
+
+types/index.ts
+
+
+Example:
+
+export interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+
+Use the type:
+
+const user: User = {
+    id: 1,
+    name: "Gelan",
+    email: "test@test.com"
+};
+
+
+========================================
+9. DEBUGGING BLANK WHITE PAGE
+========================================
+
+If React shows a blank page:
+
+
+Check browser console:
+
+Look for:
+
+- Uncaught Error
+- Cannot find module
+- Failed to compile
+
+
+Check terminal:
+
+Look for:
+
+- Vite errors
+- Import errors
+- TypeScript errors
+
+
+Common causes:
+
+1. Wrong import path
+
+2. Component has an error
+
+3. Missing dependency
+
+4. Wrong root element
+
+
+========================================
+10. CHECK PACKAGE.JSON LOCATION
+========================================
+
+IMPORTANT:
+
+Vite uses the folder containing package.json as the project root.
+
+
+Example:
+
+Correct:
+
+Dashboard-Analytics/
+
+├── package.json
+├── index.html
+├── main.tsx
+└── App.tsx
+
+
+Problem:
+
+TypeScript/
+
+├── package.json
+└── Dashboard-Analytics/
+    ├── index.html
+    └── main.tsx
+
+
+Vite may use the parent folder instead.
+
+
+========================================
+11. USE GIT AFTER SETUP WORKS
+========================================
+
+After the project runs correctly:
+
+git add .
+
+git commit -m "React project setup"
+
+
+Commit before adding big changes.
+
+
+========================================
+12. FIRST 5 MINUTES CHECKLIST
+========================================
+
+Every React project:
+
+[ ] npm install
+
+[ ] npm run dev
+
+[ ] Open localhost
+
+[ ] Check index.html has <div id="root"></div>
+
+[ ] Check main.tsx uses getElementById("root")
+
+[ ] Render "Hello React" first
+
+[ ] Then start building
+
+
+========================================
+MAIN LESSON
+========================================
+
+Before debugging React code, check:
+
+1. Am I inside the correct project folder?
+
+2. Does package.json belong to this project?
+
+3. Is Vite running from the correct root?
+
+4. Does index.html connect to main.tsx?
+
+5. Does main.tsx render App.tsx?
+
+
+A wrong project root can make correct code appear broken.
