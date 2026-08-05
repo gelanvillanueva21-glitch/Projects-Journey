@@ -1,0 +1,983 @@
+========================================
+REACT COMPONENTS CHEATSHEET + EXPLANATION
+(React + TypeScript)
+========================================
+
+
+WHAT IS A REACT COMPONENT?
+========================================
+
+A component is a reusable piece of UI.
+
+Think of components like LEGO blocks.
+
+A website is built by combining many small blocks:
+
+Website
+ |
+ ├── Navbar component
+ |
+ ├── Sidebar component
+ |
+ ├── Dashboard component
+ |
+ └── Footer component
+
+
+Instead of writing one giant HTML file,
+React lets you split your application into
+small manageable pieces.
+
+
+
+Example:
+
+function Button(){
+
+    return (
+        <button>
+            Click
+        </button>
+    );
+
+}
+
+
+This is a component.
+
+
+You can reuse it:
+
+<Button/>
+<Button/>
+<Button/>
+
+
+
+========================================
+1. FUNCTION COMPONENT
+========================================
+
+
+function App(): React.JSX.Element {
+
+    return (
+        <h1>
+            Hello React
+        </h1>
+    );
+
+}
+
+
+Explanation:
+
+A React component is just a JavaScript/TypeScript
+function that returns JSX.
+
+
+JSX looks like HTML:
+
+<h1>Hello</h1>
+
+
+but it is actually JavaScript syntax that
+React converts into real HTML.
+
+
+
+Component = Function + JSX
+
+
+
+========================================
+2. JSX
+========================================
+
+
+JSX allows you to write HTML-like code
+inside JavaScript.
+
+
+Example:
+
+
+const username = "Gelan";
+
+
+return (
+
+    <h1>
+        Hello {username}
+    </h1>
+
+);
+
+
+
+The {} means:
+
+"Run JavaScript here"
+
+
+
+Example:
+
+
+<h1>
+    {5 + 5}
+</h1>
+
+
+Output:
+
+10
+
+
+
+========================================
+3. EXPORT AND IMPORT COMPONENTS
+========================================
+
+
+Button.tsx
+
+
+function Button(){
+
+    return (
+        <button>
+            Click
+        </button>
+    );
+
+}
+
+
+export default Button;
+
+
+
+App.tsx
+
+
+import Button from "./Button";
+
+
+function App(){
+
+    return (
+
+        <div>
+
+            <Button/>
+
+        </div>
+
+    );
+
+}
+
+
+
+Explanation:
+
+
+Export:
+
+Makes a component available
+to other files.
+
+
+Import:
+
+Brings that component into another file.
+
+
+
+Large projects have many files,
+so components need to communicate.
+
+
+
+========================================
+4. PROPS (PASSING DATA)
+========================================
+
+
+Props are data sent from a parent
+component to a child component.
+
+
+
+Example:
+
+
+Parent:
+
+
+<Button text="Login"/>
+
+
+
+Child:
+
+
+type Props = {
+
+    text:string;
+
+}
+
+
+function Button({text}:Props){
+
+    return (
+
+        <button>
+            {text}
+        </button>
+
+    );
+
+}
+
+
+
+Explanation:
+
+
+The parent gives data:
+
+text="Login"
+
+
+The child receives it:
+
+{text}
+
+
+
+Flow:
+
+
+Parent
+ |
+ | sends props
+ ↓
+Child
+
+
+
+Props are READ ONLY.
+
+The child cannot modify them.
+
+
+
+========================================
+5. WHY USE PROPS?
+========================================
+
+
+Without props:
+
+
+function Button(){
+
+return (
+<button>
+Login
+</button>
+)
+
+}
+
+
+You need another button:
+
+
+function Button2(){
+
+return (
+<button>
+Register
+</button>
+)
+
+}
+
+
+
+Duplicate code.
+
+
+
+With props:
+
+
+<Button text="Login"/>
+
+<Button text="Register"/>
+
+
+
+One component,
+different results.
+
+
+
+========================================
+6. CHILDREN PROP
+========================================
+
+
+Sometimes you want to put
+components inside components.
+
+
+Example:
+
+
+<Card>
+
+    <h1>
+       Dashboard
+    </h1>
+
+</Card>
+
+
+
+The Card component receives:
+
+children
+
+
+
+Example:
+
+
+type Props = {
+
+children: React.ReactNode;
+
+}
+
+
+
+function Card({children}:Props){
+
+return (
+
+<div className="card">
+
+    {children}
+
+</div>
+
+)
+
+}
+
+
+
+Explanation:
+
+
+Anything between:
+
+<Card>
+    HERE
+</Card>
+
+
+becomes:
+
+children
+
+
+
+========================================
+7. STATE (useState)
+========================================
+
+
+State is data that can change
+and cause the component to update.
+
+
+
+Example:
+
+Counter:
+
+
+const [count,setCount] = useState(0);
+
+
+
+Meaning:
+
+
+count
+=
+current value
+
+
+setCount
+=
+function to change value
+
+
+
+Example:
+
+
+<button
+onClick={() => setCount(count + 1)}
+>
+
+Add
+
+</button>
+
+
+
+Before:
+
+count = 0
+
+
+Click button:
+
+
+count = 1
+
+
+React automatically updates the screen.
+
+
+
+========================================
+8. WHY NOT NORMAL VARIABLES?
+========================================
+
+
+This does NOT update UI:
+
+
+let count = 0;
+
+
+count++;
+
+
+
+React does not know it changed.
+
+
+
+State tells React:
+
+
+"Hey, this data changed.
+Render the component again."
+
+
+
+========================================
+9. EVENT HANDLING
+========================================
+
+
+Events are user actions.
+
+
+Examples:
+
+
+Click button:
+
+onClick
+
+
+Typing:
+
+onChange
+
+
+Submitting:
+
+onSubmit
+
+
+
+Example:
+
+
+<button
+onClick={handleClick}
+>
+
+Click
+
+</button>
+
+
+
+When user clicks:
+
+React runs:
+
+handleClick()
+
+
+
+========================================
+10. CONDITIONAL RENDERING
+========================================
+
+
+Showing different UI depending
+on conditions.
+
+
+
+Example:
+
+
+{isLoading && (
+
+<p>
+Loading...
+</p>
+
+)}
+
+
+
+Meaning:
+
+
+If isLoading is true:
+
+show Loading
+
+
+
+Example:
+
+
+isLoggedIn
+?
+<Dashboard/>
+:
+<Login/>
+
+
+
+Meaning:
+
+
+If logged in:
+
+show Dashboard
+
+
+Otherwise:
+
+show Login
+
+
+
+========================================
+11. RENDERING LISTS
+========================================
+
+
+Usually data comes as arrays.
+
+
+
+Example:
+
+
+const users = [
+
+"John",
+"Alex",
+"Mike"
+
+];
+
+
+
+Display:
+
+
+users.map(user => (
+
+<p>
+{user}
+</p>
+
+))
+
+
+
+map means:
+
+
+"Take every item and create JSX"
+
+
+
+Result:
+
+
+<p>John</p>
+
+<p>Alex</p>
+
+<p>Mike</p>
+
+
+
+========================================
+12. KEY IN LISTS
+========================================
+
+
+React needs a unique ID
+to track items.
+
+
+
+Example:
+
+
+users.map(user=>(
+
+<p key={user.id}>
+
+{user.name}
+
+</p>
+
+))
+
+
+
+Key helps React know:
+
+- What changed?
+- What was removed?
+- What was added?
+
+
+
+========================================
+13. useEffect
+========================================
+
+
+useEffect runs code after
+a component appears.
+
+
+
+Common uses:
+
+
+- Fetching API data
+- Timers
+- Listening events
+
+
+
+Example:
+
+
+useEffect(()=>{
+
+
+fetchUsers();
+
+
+},[])
+
+
+
+The [] means:
+
+Run only once when component loads.
+
+
+
+========================================
+14. CUSTOM HOOKS
+========================================
+
+
+A hook is reusable logic.
+
+
+
+Example:
+
+
+useMetrics()
+
+
+Instead of writing:
+
+
+fetch data
+loading state
+error handling
+
+
+inside every component,
+
+you create:
+
+useMetrics()
+
+
+and reuse it.
+
+
+
+Example:
+
+
+const {
+
+data,
+
+isLoading,
+
+error
+
+}=useMetrics();
+
+
+
+========================================
+15. COMPONENT COMMUNICATION
+========================================
+
+
+Parent → Child:
+
+
+Use props.
+
+
+
+Child → Parent:
+
+
+Use callback functions.
+
+
+
+Example:
+
+
+Parent:
+
+
+function handleClick(){
+
+console.log("Clicked");
+
+}
+
+
+<Child onClick={handleClick}/>
+
+
+
+Child:
+
+
+props.onClick();
+
+
+
+========================================
+16. COMPONENT STRUCTURE
+========================================
+
+
+Professional React projects:
+
+
+src/
+
+components/
+
+    Button.tsx
+
+    Navbar.tsx
+
+    Card.tsx
+
+
+pages/
+
+    Home.tsx
+
+    Dashboard.tsx
+
+
+hooks/
+
+    useAuth.ts
+
+
+types/
+
+    user.ts
+
+
+
+Each file has one responsibility.
+
+
+
+========================================
+17. YOUR DASHBOARD EXAMPLE
+========================================
+
+
+App.tsx
+
+
+Controls:
+
+- Current selected period
+- Data loading
+- Main layout
+
+
+
+MetricCard
+
+
+Displays:
+
+- Revenue
+- Users
+- Sales
+
+
+
+PeriodSelector
+
+
+Controls:
+
+7 days
+30 days
+90 days
+
+
+
+TransactionList
+
+
+Displays:
+
+Customer transactions
+
+
+
+Structure:
+
+
+App
+
+ |
+ |-- PeriodSelector
+
+ |
+ |-- MetricCard
+
+ |
+ |-- TransactionList
+
+
+
+========================================
+18. IMPORTANT REACT RULES
+========================================
+
+
+1. Component names start uppercase
+
+
+Correct:
+
+function Button()
+
+
+Wrong:
+
+function button()
+
+
+
+2. Components return JSX
+
+
+3. Keep components small
+
+
+4. Use props to pass data
+
+
+5. Use state for changing data
+
+
+6. Avoid repeating code
+
+
+7. One component should have one job
+
+
+
+========================================
+THE BIG IDEA
+========================================
+
+
+React application:
+
+
+Data
+ |
+ ↓
+State
+ |
+ ↓
+Components
+ |
+ ↓
+Props
+ |
+ ↓
+UI
+
+
+
+React's job:
+
+"Take changing data and keep
+the screen updated automatically."
+
+========================================
+END
+========================================
