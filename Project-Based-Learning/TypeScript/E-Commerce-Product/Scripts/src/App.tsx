@@ -1,48 +1,30 @@
 
 
 import React, { useState }  from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ProductGrid } from "./ProductGrid";
+import { fetchProducts } from "./api";
 import type { Product } from "./types";
-
-
-
-const SAMPLE_PRODUCTS: Product[] = [
-    {
-        id: 1,
-        title: "Fjallraven Backpack",
-        price: 109.95,
-        description: "Your perfect pack for everyday use.",
-        category: "men's clothing",
-        image: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg",
-        rating: { rate: 3.9, count: 120 },
-    },
-    {
-        id: 2,
-        title: "Mens Casual Premium Slim Fit T-Shirts",
-        price: 22.3,
-        description: "Slim-fitting style.",
-        category: "men's clothing",
-        image: "https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg",
-        rating: { rate: 4.1, count: 259 },
-    },
-    {
-        id: 3,
-        title: "Mens Cotton Jacket",
-        price: 55.99,
-        description: "Great outerwear jackets for Spring/Autumn/Winter.",
-        category: "men's clothing",
-        image: "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
-        rating: { rate: 4.7, count: 500 },
-    }
-]
 
 
 function App(): React.JSX.Element {
     const [cartCount, setCartCount] = useState(0);
+    const { data: products, isLoading, error } = useQuery({
+        queryKey: ["products"],
+        queryFn: fetchProducts,
+    })
+
     function handleAddToCart(product: Product): void {
         console.log("Added:", product.title);
         setCartCount((prev) => prev + 1)
     }
+
+    if (isLoading)
+        return <div className="store"><p>Loading products...</p></div>
+    if (error)
+        return <div className="store">
+            <p className="error">Failed to load products: {error.message}</p>
+        </div>;
 
     return (
         <div className="store">
@@ -50,7 +32,7 @@ function App(): React.JSX.Element {
                 <h1>Drift Store</h1>
                 <span className="cart-badge">Cart: {cartCount}</span>
             </header>
-            <ProductGrid products={SAMPLE_PRODUCTS} onAddToCart={handleAddToCart}/>
+            <ProductGrid products={products ?? []} onAddToCart={handleAddToCart}/>
         </div>
     )
 
