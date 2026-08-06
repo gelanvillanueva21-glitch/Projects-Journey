@@ -10,19 +10,22 @@ interface ProductCardProps {
 }
 
 
-export function ProductCard({ product, onAddToCart }: ProductCardProps): React.JSX.Element {
+export const ProductCard = React.memo(function ProductCard({
+    product,
+    onAddToCart,
+}: ProductCardProps): React.JSX.Element {
     function handleAddToCart(): void {
-        onAddToCart(product);
+        onAddToCart(product)
     }
 
     return (
         <div className="product-card">
             <img 
-                src={product.image} 
+                src={product.image}
                 alt={product.title}
                 className="product-image"
                 onError={(e) => {
-                    (e.target as HTMLImageElement).src = "https://via.placeholder.com/200";
+                    (e.target as HTMLImageElement).src = "https://via.placeholder.com/200"
                 }}
             />
             <div className="product-info">
@@ -32,16 +35,13 @@ export function ProductCard({ product, onAddToCart }: ProductCardProps): React.J
                     ⭐ {product.rating.rate} ({product.rating.count} reviews)
                 </div>
                 <p className="product-price">${product.price.toFixed(2)}</p>
-                <button 
-                    className="add-to-cart-btn" 
-                    onClick={handleAddToCart}>
-                    Add To Cart
+                <button className="add-to-cart-btn" onClick={handleAddToCart}>
+                    Add To Cart.
                 </button>
             </div>
         </div>
-    )
-}
-
+    );
+});
 
 
 
