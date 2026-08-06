@@ -1,14 +1,15 @@
 
 
-import React, { useState }  from "react";
+import React  from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ProductGrid } from "./ProductGrid";
+import { useCart } from "./CartContext";
 import { fetchProducts } from "./api";
 import type { Product } from "./types";
 
 
 function App(): React.JSX.Element {
-    const [cartCount, setCartCount] = useState(0);
+    const { addItem, totalItems } = useCart();
     const { data: products, isLoading, error } = useQuery({
         queryKey: ["products"],
         queryFn: fetchProducts,
@@ -16,7 +17,7 @@ function App(): React.JSX.Element {
 
     function handleAddToCart(product: Product): void {
         console.log("Added:", product.title);
-        setCartCount((prev) => prev + 1)
+        addItem(product);
     }
 
     if (isLoading)
@@ -30,7 +31,7 @@ function App(): React.JSX.Element {
         <div className="store">
             <header className="store-header">
                 <h1>Drift Store</h1>
-                <span className="cart-badge">Cart: {cartCount}</span>
+                <span className="cart-badge">Cart: {totalItems}</span>
             </header>
             <ProductGrid products={products ?? []} onAddToCart={handleAddToCart}/>
         </div>
