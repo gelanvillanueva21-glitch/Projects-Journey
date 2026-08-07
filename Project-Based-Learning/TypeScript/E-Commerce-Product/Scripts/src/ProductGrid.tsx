@@ -15,6 +15,7 @@ interface ProductGridProps {
 export function ProductGrid({ products, onAddToCart }: ProductGridProps): React.JSX.Element {
     if (products.length === 0)
         return <p className="empty-grid">No products available.</p>;
+    console.log(`[Product Grid]: [${products}]`);
     return (
         <div className="product-grid">
             {products.map((product) => (

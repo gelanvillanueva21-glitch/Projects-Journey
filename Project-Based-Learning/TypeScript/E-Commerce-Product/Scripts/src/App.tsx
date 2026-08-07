@@ -1,9 +1,10 @@
 
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ProductGrid } from "./ProductGrid";
 import { useCart } from "./CartContext";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { fetchProducts } from "./api";
 import type { Product } from "./types";
 
@@ -19,6 +20,7 @@ function App(): React.JSX.Element {
     })
 
     const categories = useMemo(() => {
+        console.log("Category");
         if (!products)
             return ["all"];
         const cats = new Set(products.map((p) => p.category));
@@ -37,11 +39,12 @@ function App(): React.JSX.Element {
             return matchesSearch && matchesCategory;
         })  
     }, [products, searchQuery, selectedCategory]);
-
-    function handleAddToCart(product: Product): void {
+    
+    console.log(`[Filtered Products]: [${filteredProducts}]`);
+    const handleAddToCart = useCallback((product: Product): void => {
         console.log("Added:", product.title);
         addItem(product);
-    }
+    }, [addItem])
 
     if (isLoading)
         return <div className="store"><p>Loading products...</p></div>
@@ -50,6 +53,7 @@ function App(): React.JSX.Element {
             <p className="error">Failed to load products: {error.message}</p>
         </div>;
 
+    console.log("[App]");
     return (
         <div className="store">
             <header className="store-header">
@@ -77,7 +81,9 @@ function App(): React.JSX.Element {
                     ))}
                 </select>
             </div>
-            <ProductGrid products={filteredProducts} onAddToCart={handleAddToCart}/>
+            <ErrorBoundary>
+                <ProductGrid products={filteredProducts} onAddToCart={handleAddToCart}/>
+            </ErrorBoundary>
         </div>
     )
 

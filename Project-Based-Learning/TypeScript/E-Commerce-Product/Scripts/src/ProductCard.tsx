@@ -15,6 +15,7 @@ export const ProductCard = React.memo(function ProductCard({
     onAddToCart,
 }: ProductCardProps): React.JSX.Element {
     function handleAddToCart(): void {
+        console.log("Hello! Added product!");
         onAddToCart(product)
     }
 
