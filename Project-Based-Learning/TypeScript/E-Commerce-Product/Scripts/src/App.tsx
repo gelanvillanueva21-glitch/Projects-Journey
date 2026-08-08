@@ -1,6 +1,6 @@
 
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useCallback, useMemo} from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ProductGrid } from "./ProductGrid";
 import { useCart } from "./CartContext";
@@ -30,6 +30,7 @@ function App(): React.JSX.Element {
     const filteredProducts = useMemo(() => {
         if (!products)
             return []
+        console.log(`[Filtered Products]`);
         return products.filter((product) => {
             const matchesSearch = product.title
                 .toLowerCase()
@@ -40,11 +41,10 @@ function App(): React.JSX.Element {
         })  
     }, [products, searchQuery, selectedCategory]);
     
-    console.log(`[Filtered Products]: [${filteredProducts}]`);
     const handleAddToCart = useCallback((product: Product): void => {
         console.log("Added:", product.title);
         addItem(product);
-    }, [addItem])
+    }, [addItem]);
 
     if (isLoading)
         return <div className="store"><p>Loading products...</p></div>
@@ -52,6 +52,7 @@ function App(): React.JSX.Element {
         return <div className="store">
             <p className="error">Failed to load products: {error.message}</p>
         </div>;
+
 
     console.log("[App]");
     return (
