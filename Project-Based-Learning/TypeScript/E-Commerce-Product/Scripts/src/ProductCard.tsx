@@ -19,6 +19,7 @@ export const ProductCard = React.memo(function ProductCard({
         onAddToCart(product)
     }
 
+    console.log("[Product Card]");
     return (
         <div className="product-card">
             <img 
