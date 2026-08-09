@@ -7,7 +7,7 @@ import { useEffect, useRef } from "react";
 
 function UseRef() {
     
-    let inputRef = useRef<HTMLInputElement>(undefined);
+    let inputRef = useRef<HTMLInputElement>(null);
     let ref = useRef(0);
     useEffect(() => {
         console.log("Component Render!");
