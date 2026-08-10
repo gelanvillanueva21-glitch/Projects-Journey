@@ -1,0 +1,41 @@
+
+
+
+html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 62.5%;
+}
+
+
+
+
+
+#root {
+    min-height: 100vh;
+
+    display: grid;
+    grid-template-columns: 20% 80%;
+    grid-template-rows: 12% 88%;
+    grid-template-areas:
+        "sidebar navbar"
+        "sidebar content";
+
+    justify-content: center;
+    background-color: #ffffff;
+    color: #333333;
+}   
+
+
+#side-bar {
+    grid-area: sidebar;
+}
+
+#nav-bar {
+    grid-area: navbar;
+}
+
+#content {
+    grid-area: content;
+}

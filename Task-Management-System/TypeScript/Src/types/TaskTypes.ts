@@ -1,6 +1,6 @@
 
 
-interface Task {
+export interface Task {
     title: string;
     description: string;
     status: "todo" | "in-progress" | "set-aside" | "done";
@@ -10,5 +10,4 @@ interface Task {
 }
 
 
-export default Task;
 

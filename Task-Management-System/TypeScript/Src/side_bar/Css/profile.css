@@ -1,0 +1,40 @@
+
+
+.profile-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-top: 25px;
+    padding: 24px 16px;
+    box-sizing: border-box;
+}
+
+#profile-picture {
+    width: 100px;
+    height: 100px;
+
+    object-fit: cover;
+    border-radius: 50%;
+
+    border: 3px solid #bdbdbd;
+    background-color: #e5e5e5;
+}
+
+.profile-content h3 {
+    max-width: 100%;
+    margin: 14px 0 0;
+
+    overflow: hidden;
+    color: #333333;
+
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+

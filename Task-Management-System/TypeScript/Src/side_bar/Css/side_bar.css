@@ -1,0 +1,21 @@
+
+
+
+#side-bar {
+    width: 20%;
+    height: 96%;
+    position: fixed;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 24px 16px;
+    margin-left: 5px;
+    box-sizing: border-box;
+
+    background-color: #f2f2f2;
+    color: #333333;
+
+    border: 1px solid #bdbdbd;
+    border-radius: 16px;
+}
