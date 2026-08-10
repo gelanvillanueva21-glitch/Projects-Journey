@@ -1,6 +1,7 @@
 
 
-import React, { useState } from "react";
+import React from "react";
+import icon from "./Icon/task_icon.svg"
 
 
 function IconTitle(): React.JSX.Element {
@@ -11,10 +12,10 @@ function IconTitle(): React.JSX.Element {
                 onClick={() => window.location.reload()}
                 className="task-icon">
                 <img 
-                    src="Icon/task_icon.svg" 
+                    src={icon} 
                     alt="Task Icon" />
             </button>
-            <h2 className="title">Taskboard — Management</h2>
+            <h2 className="title">Taskboard Management</h2>
         </div>
     )
 

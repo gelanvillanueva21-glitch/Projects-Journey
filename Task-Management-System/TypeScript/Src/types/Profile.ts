@@ -1,6 +1,6 @@
 
 
-import Task from "./TaskTypes";
+import {type Task} from "./TaskTypes";
 
 
 interface Auth {
@@ -8,7 +8,7 @@ interface Auth {
 }
 
 
-interface Profile {
+export interface Profile {
     profilePicture?: string;
     token: Auth;
     name: string;
@@ -16,5 +16,4 @@ interface Profile {
 }
 
 
-export default Profile;
 
