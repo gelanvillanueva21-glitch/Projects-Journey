@@ -6,7 +6,7 @@ import { ChangePasswordButton } from "./change_password/change_password";
 import { LogOutButton } from "./log_out/logout";
 import { RegisterButton } from "./register/register";
 import { LogInButton } from "./log_in/login";
-
+import { ChangePasswordWindow } from "./change_password/change_pass_window";
 
 
 
@@ -36,7 +36,7 @@ export function ButtonLayer(): React.JSX.Element {
                 <div></div>
             )}
             {activeWindow === "change_password" && (
-                <div></div>
+                <ChangePasswordWindow onClose={() => setActiveWindow(null)}/>
             )}
         </>
     )
