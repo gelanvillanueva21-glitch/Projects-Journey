@@ -11,5 +11,9 @@ export interface ButtonProps {
 }
 
 
+export interface WindowProps {
+    onClose: () => void;
+}
+
 
 
