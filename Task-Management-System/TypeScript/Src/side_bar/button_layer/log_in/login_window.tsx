@@ -8,7 +8,7 @@ import { account } from "../../../types/AccountData";
 export function LoginWindow({onClose}: WindowProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [isExist, setIsExist] = useState(true);
+    const [isAccountExist, setAccountExist] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
 
     function login() {
@@ -16,10 +16,12 @@ export function LoginWindow({onClose}: WindowProps) {
             account => account.username === username && account.password === password
         )
         if (!user) {
-            setIsExist(false);
-            return false;
-        } else 
-            return true;
+            setAccountExist(false);
+        }
+        if (user) {
+            localStorage.setItem("JWT", user.token.authorization);
+            window.location.reload();
+        }
     }
 
     return (
@@ -36,7 +38,12 @@ export function LoginWindow({onClose}: WindowProps) {
                         &times;
                     </button>
                 </div>
-                <form className="login-form">
+                <form 
+                    className="login-form"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        login();
+                    }}>
                     <div className="login-input">
                         <label htmlFor="username">Username</label>
                         <input 
@@ -59,11 +66,11 @@ export function LoginWindow({onClose}: WindowProps) {
                             required
                         />
                     </div>
-                    {isExist? (
+                    {isAccountExist === false && (
                         <p className="error-message">
-                        Account not found, or password/username inccorect
-                    </p>
-                    ) : ""}
+                            Account not found, or password/username inccorect
+                        </p>
+                        )}
                     <button
                         type="button"
                         className="show-password-button"
