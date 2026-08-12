@@ -21,12 +21,16 @@ export function ButtonLayer(): React.JSX.Element {
         <>
             <div className="sidebar-button-container">
                 {isJwtExist? (
-                    <LogOutButton onClick={() => setActiveWindow("logout")}/>
+                    <>
+                        <LogOutButton onClick={() => setActiveWindow("logout")}/>
+                        <ChangePasswordButton onClick={() => setActiveWindow("change_password")}/>
+                    </>
                 ): (
-                    <LogInButton onClick={() => setActiveWindow("login")}/>
+                    <>
+                        <LogInButton onClick={() => setActiveWindow("login")}/>
+                        <RegisterButton onClick={() => setActiveWindow("register")}/>
+                    </>
                 )}
-                <RegisterButton onClick={() => setActiveWindow("register")}/>
-                <ChangePasswordButton onClick={() => setActiveWindow("change_password")}/>
             </div>
 
             {activeWindow === "login" && (

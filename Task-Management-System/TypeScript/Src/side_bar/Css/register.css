@@ -1,0 +1,166 @@
+
+
+.register-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: rgba(0, 0, 0, 0.35);
+}
+
+.register-window {
+    width: 420px;
+    padding: 24px;
+    box-sizing: border-box;
+
+    background-color: #ffffff;
+    border: 1px solid #bdbdbd;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.register-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 24px;
+}
+
+.register-header h2 {
+    margin: 0;
+
+    color: #222222;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.register-header .close-button {
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+
+    background-color: transparent;
+    color: #555555;
+
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.register-header .close-button:hover {
+    background-color: #eeeeee;
+    color: #111111;
+}
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.register-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.register-input label {
+    color: #444444;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.register-input input {
+    width: 100%;
+    padding: 12px 14px;
+    box-sizing: border-box;
+
+    border: 1px solid #bdbdbd;
+    border-radius: 8px;
+    outline: none;
+
+    background-color: #fafafa;
+    color: #222222;
+
+    font-size: 14px;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.register-input input::placeholder {
+    color: #999999;
+}
+
+.register-input input:focus {
+    border-color: #555555;
+    background-color: #ffffff;
+}
+
+.register-form p {
+    margin: -6px 0 0;
+
+    color: #777777;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+}
+
+.register-form .show-password-button {
+    align-self: flex-end;
+
+    padding: 7px 11px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+
+    background-color: #ffffff;
+    color: #444444;
+
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.register-form .show-password-button:hover {
+    background-color: #eeeeee;
+    color: #111111;
+}
+
+.register-button {
+    width: 100%;
+    padding: 13px;
+
+    border: 1px solid #333333;
+    border-radius: 8px;
+
+    background-color: #333333;
+    color: #ffffff;
+
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.register-button:hover {
+    background-color: #555555;
+}
+
+@media (max-width: 480px) {
+    .register-window {
+    width: 90%;
+    padding: 20px;
+    }
+}
+

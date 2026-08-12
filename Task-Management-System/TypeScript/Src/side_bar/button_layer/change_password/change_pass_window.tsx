@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { WindowProps } from "../../props";
+import { account } from "../../../types/AccountData";
+import JWToken from "../../../types/ApiData";
 
 
 export function ChangePasswordWindow({onClose}: WindowProps) {
@@ -11,9 +13,14 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
 
-    function changePassword() {
-        if (true) {
-
+    function temporaryChangePassword() {
+        const token = JWToken();
+        const data = account.find(
+            account => account.token.authorization === token
+        )
+        if (data?.password === currentPassword && newPassword === confirmNewPassword) {
+            data.password = currentPassword;
+            window.location.reload();
         }
     }
 
@@ -34,7 +41,12 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
                 </button>
                 </div>
 
-                <form className="password-form">
+                <form 
+                    className="password-form"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        temporaryChangePassword();
+                    }}>
                 <div className="input-group">
                     <label htmlFor="current-password">Current Password</label>
                     <input
@@ -82,7 +94,7 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
                 <button 
                     type="submit" 
                     className="change-password-button"
-                    onClick={changePassword}
+                    onClick={temporaryChangePassword}
                 >
                     Change Password
                 </button>
