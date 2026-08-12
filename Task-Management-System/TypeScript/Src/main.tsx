@@ -9,6 +9,8 @@ import "./side_bar/Css/side_bar.css";
 import "./side_bar/Css/title_style.css";
 import "./side_bar/Css/profile.css";
 import "./side_bar/Css/change_password.css";
+import "./side_bar/Css/buttons.css";
+import "./side_bar/Css/login.css";
 
 
 const queryClient = new QueryClient();

@@ -6,6 +6,17 @@ import type { WindowProps } from "../../props";
 
 export function ChangePasswordWindow({onClose}: WindowProps) {
     const [showPassword, setShowPassword] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
+
+    function changePassword() {
+        if (true) {
+
+        }
+    }
+
     
     return (
         <div className="password-overlay" id="password-window">
@@ -16,7 +27,7 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
                 <button
                     type="button"
                     className="close-button"
-                    onClick={() => onClose}
+                    onClick={onClose}
                     aria-label="Close"
                 >
                     &times;
@@ -29,6 +40,8 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
                     <input
                     type={showPassword? "text" : "password"}
                     id="current-password"
+                    name="currentPassword"
+                    onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
                     required
                     />
@@ -39,6 +52,8 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
                     <input
                     type={showPassword? "text" : "password"}
                     id="new-password"
+                    name="newPassword"
+                    onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password"
                     required
                     />
@@ -49,6 +64,8 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
                     <input
                     type={showPassword? "text" : "password"}
                     id="confirm-password"
+                    name="confirmNewPassword"
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
                     placeholder="Confirm new password"
                     required
                     />
@@ -57,12 +74,16 @@ export function ChangePasswordWindow({onClose}: WindowProps) {
                 <button
                     type="button"
                     className="show-password-button"
-                    onClick={() => setShowPassword(false)}
+                    onClick={() => setShowPassword(prev => !prev)}
                 >
                     {showPassword? "Show Password" : "Hide Password"}
                 </button>
 
-                <button type="submit" className="change-password-button">
+                <button 
+                    type="submit" 
+                    className="change-password-button"
+                    onClick={changePassword}
+                >
                     Change Password
                 </button>
                 </form>

@@ -1,6 +1,6 @@
 
 
-import { type Profile } from "./Profile";
+import { type Account } from "./Profile";
 
 
 const JWToken = () => {

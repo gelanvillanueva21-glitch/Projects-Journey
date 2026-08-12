@@ -8,11 +8,13 @@ interface Auth {
 }
 
 
-export interface Profile {
+export interface Account {
     profilePicture?: string;
     token: Auth;
     name: string;
     taskList: Task[];
+    username: string;
+    password: string;
 }
 
 
