@@ -17,7 +17,10 @@ import "./side_bar/Css/login.css";
 import "./side_bar/Css/logout.css";
 import "./side_bar/Css/register.css";
 
-
+// NAVIGATION BAR STYLE
+import "./navigation_bar/Css/nav_bar.css"
+import "./navigation_bar/Css/social_media_button.css";
+import "./navigation_bar/Css/analytics_button.css"
 
 
 const queryClient = new QueryClient();

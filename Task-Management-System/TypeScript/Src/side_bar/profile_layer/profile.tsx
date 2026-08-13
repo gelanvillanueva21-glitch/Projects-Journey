@@ -1,7 +1,7 @@
 
 
 import React from "react";
-import type { ProfileProps } from "../props";
+import type { ProfileProps } from "../../types/props";
 import temporaryProfile from "./Icon/user-profile-person.svg";
 
 
