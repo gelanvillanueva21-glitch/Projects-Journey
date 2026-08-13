@@ -1,6 +1,6 @@
 
 
-import type { ButtonProps } from "../../props"
+import type { ButtonProps } from "../../../types/props"
 
 
 export function RegisterButton({onClick}: ButtonProps) {

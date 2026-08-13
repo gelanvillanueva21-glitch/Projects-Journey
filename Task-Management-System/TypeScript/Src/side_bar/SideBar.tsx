@@ -2,7 +2,7 @@
 import React from "react";
 import IconTitle from "./icon_title_layer/Title";
 import { ProfileLayer } from "./profile_layer/profile";
-import type { ProfileProps } from "./props";
+import type { ProfileProps } from "../types/props";
 import { ButtonLayer } from "./button_layer/layer";
 
 

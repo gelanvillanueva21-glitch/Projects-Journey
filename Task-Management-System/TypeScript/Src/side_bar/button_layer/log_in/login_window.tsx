@@ -1,7 +1,7 @@
 
 
 import { useState } from "react";
-import type { WindowProps } from "../../props";
+import type { WindowProps } from "../../../types/props";
 import { account } from "../../../types/AccountData";
 
 
