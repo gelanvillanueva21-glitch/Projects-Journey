@@ -20,10 +20,11 @@ import "./side_bar/Css/register.css";
 // NAVIGATION BAR STYLE
 import "./navigation_bar/Css/nav_bar.css"
 import "./navigation_bar/Css/social_media_button.css";
-import "./navigation_bar/Css/analytics_button.css"
+import "./navigation_bar/Css/analytics_button.css";
 
 
 const queryClient = new QueryClient();
+
 
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
