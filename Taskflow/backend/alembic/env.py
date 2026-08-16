@@ -9,7 +9,7 @@ from alembic import context
 
 from app.core.config import settings
 from app.core.database import Base
-from app.models import task  # noqa: F401 -- ensures models are registered
+from app.models import task, user  # noqa: F401 -- ensures models are registered
 
 config = context.config
 
