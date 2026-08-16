@@ -3,20 +3,23 @@
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+import bcrypt
 from jose import jwt
-from passlib.context import CrpytContext
 from app.core.config import settings
 
 
-pwd_context = CrpytContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def hash_password(plain_password: str) -> str:
-    return pwd_context.hash(plain_password)
+    return bcrypt.hashpw(plain_password
+        .encode("utf-8"), 
+        bcrypt.gensalt()).decode("utf-8")
 
 
-def verify_password(plain_password: str, hahsed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hahsed_password)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"),
+        hashed_password.encode("utf-8")
+    )
 
 
 def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
