@@ -11,18 +11,21 @@ class TaskRepository:
         self.db = db
 
 
-    async def get_all(self) -> list[Task]:
-        result = await self.db.execute(select(Task))
+    async def get_all_by_owner(self, owner_id: int) -> list[Task]:
+        result = await self.db.execute(select(Task).where(Task.owner_id == owner_id))
         return result.scalars().all()
 
 
-    async def get_by_id(self, task_id: int) -> Task | None:
-        result = await self.db.execute(select(Task).where(Task.id == task_id))
+    async def get_by_id(self, task_id: int, owner_id: int) -> Task | None:
+        result = await self.db.execute(select(Task).where(
+            Task.id == task_id,
+            Task.owner_id == owner_id
+            ))
         return result.scalar_one_or_none()
 
 
-    async def create(self, data: TaskCreate) -> Task:
-        task = Task(**data.model_dump())
+    async def create(self, data: TaskCreate, owner_id: int) -> Task:
+        task = Task(**data.model_dump(), owner_id=owner_id)
         self.db.add(task)
         await self.db.commit()
         await self.db.refresh(task)

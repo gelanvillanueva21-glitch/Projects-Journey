@@ -15,7 +15,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post(
     "/register", 
-    Response_model=UserResponse,
+    response_model=UserResponse,
     status_code=status.HTTP_201_CREATED
 )
 async def register(
@@ -37,7 +37,7 @@ async def login(
     data: UserLogin,
     repo: UserRepository = Depends(get_user_repo)):
         user = await repo.get_by_email(data.email)
-        if not user or verify_password(data.password, user.hashed_password):
+        if not user or not verify_password(data.password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect email or password",
