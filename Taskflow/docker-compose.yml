@@ -32,6 +32,20 @@ services:
         condition: service_healthy
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
+  frontend:
+    build: ./frontend
+    container_name: taskflow-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+
 volumes:
   postgres_data:
 
