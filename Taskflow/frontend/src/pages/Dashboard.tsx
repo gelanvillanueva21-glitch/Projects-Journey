@@ -14,6 +14,10 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+    const [editTitle, setEditTitle] = useState('');
+    const [editDescription, setEditDescription] = useState('');
+
     useEffect(() => {
         getTasks().then(setTasks)
             .catch(() => setError('Failed to load tasks'))
@@ -50,6 +54,36 @@ export default function Dashboard() {
             setTasks(tasks.filter((t) => t.id !== id))
         } catch (err) {
             setError(err instanceof ApiError ? err.message : 'Failed to delete task')
+        }
+    }
+
+    function startEditing(task: Task) {
+        setEditingTaskId(task.id);
+        setEditTitle(task.title);
+        setEditDescription(task.description ?? '');
+    }
+
+    function cancelEditing() {
+        setEditingTaskId(null);
+        setEditTitle('');
+        setEditDescription('');
+    }
+
+    async function handleEditSave(id: number) {
+        if (!editTitle.trim()) {
+            setError('Title cannot be empty');
+            return
+        }
+
+        try {
+            const updated = await updateTask(id, {
+                title: editTitle,
+                description: editDescription || undefined
+            });
+            setTasks(tasks.map((t) => (t.id === id ? updated : t)))
+            cancelEditing()
+        } catch (err) {
+            setError(err instanceof ApiError ? err.message : 'Failed to update task')
         }
     }
 
@@ -99,32 +133,85 @@ export default function Dashboard() {
                     <p className="text-gray-500">No task yet - add one above.</p>
                 ) : (
                     <ul className="space-y-2">
-                        {tasks.map((task) => (
-                            <li 
+                        {tasks.map((task) => editingTaskId === task.id ? (
+                            <li
                                 key={task.id}
-                                className="bg-white rounded shadow-sm px-4 py-3 flex items-center justify-between"
+                                className="bg-white rounded shadow-sm px-4 py-3"
                             >
-                                <label className="flex items-center gap-3 cursor-pointer flex-1">
-                                    <input 
-                                        type="checkbox"
-                                        checked={task.completed}
-                                        onChange={() => handleToggle(task)}
-                                        className="h-4 w-4"
+                                <input 
+                                    type="text"
+                                    value={editTitle}
+                                    onChange={(e) => setEditTitle(e.target.value)}
+                                    className="w-full border border-gray-300 rounded px-2 py-1 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Title"
+                                    autoFocus
+                                />
+                                <textarea 
+                                    value={editDescription}
+                                    onChange={(e) => setEditDescription(e.target.value)}
+                                    className="w-full border border-gray-300 rounded px-2 py-1 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder="Description (optional)"
+                                    rows={2}
                                     />
-                                    <span
-                                        className={
-                                            task.completed? 'line-through text-gray-400' : 'text-gray-800'
-                                        }
+                                <div className="flex gap-2 justify-end">
+                                    <button
+                                        onClick={cancelEditing}
+                                        className="text-sm text-gray-500 px-3 py-1 rounded hover:bg-gray-100"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => handleEditSave(task.id)}
+                                        className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </li>
+                        ) : (
+                            <li
+                                key={task.id}
+                                className="bg-white rounded shadow-sm px-4 py-3"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <label 
+                                        className="flex items-center gap-3 cursor-pointer flex-1 min-w-0"
+                                    >
+                                        <input 
+                                            type="checkbox"
+                                            checked={task.completed}
+                                            onChange={() => handleToggle(task)}
+                                            className="h-4 w-4 shrink-0"
+                                        />
+                                        <span
+                                            className={
+                                                'trunccate ' + 
+                                                (task.completed ? 'line-through text-gray-400' : 'text-gray-800')
+                                            }
                                         >
                                             {task.title}
-                                    </span>
-                                </label>
-                                <button
-                                    onClick={() => handleDelete(task.id)}
-                                    className="text-sm text-red-500 hover:underline ml-3"
-                                >
-                                    Delete
-                                </button>
+                                        </span>
+                                    </label>
+                                    <div className="flex gap-3 ml-3 shrink-0">
+                                        <button
+                                            onClick={() => startEditing(task)}
+                                            className="text-sm text-blue-500 hover:underline"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(task.id)}
+                                            className="text-sm text-red-500 hover:underline"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                                {task.description && (
+                                    <p className="text-sm text-red-500 hover:underline">
+                                        {task.description}
+                                    </p>
+                                )}
                             </li>
                         ))}
                     </ul>
