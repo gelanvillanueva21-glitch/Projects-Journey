@@ -1,14 +1,26 @@
 
 
+import { BrowserRouter, Routes, Route} from 'react-router-dom'
+import LoginPage from "./pages/LoginPage";
+import { DashBoard } from "./router/DashboardRoute";
+import { ProtectedRoute } from "./router/ProtectedRoute";
+
 
 
 function App() {
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-            <h1 className="text-4xl font-bold text-blue-600">
-                TaskFlow Frontend is Running
-            </h1>
-        </div>
+        <BrowserRouter>
+            <Routes>
+                <Route path='login' element={<LoginPage/>}/>
+                <Route 
+                    path='/' 
+                    element={
+                        <ProtectedRoute>
+                            <DashBoard/>
+                        </ProtectedRoute>
+                    } />
+            </Routes>
+        </BrowserRouter>
     )
 }
 

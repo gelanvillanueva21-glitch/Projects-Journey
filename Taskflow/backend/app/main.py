@@ -37,7 +37,7 @@ app.add_middleware(
 
 
 app.include_router(tasks_router.router, prefix="/api/v1")
-app.include_router(auth_router.router, prefix="/api.v1")
+app.include_router(auth_router.router, prefix="/api/v1")
 
 
 @app.get("/health")
