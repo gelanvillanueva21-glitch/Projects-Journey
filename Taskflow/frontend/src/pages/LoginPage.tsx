@@ -2,7 +2,7 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext";
 import { ApiError } from "../api/client";
 
@@ -13,6 +13,7 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState<string | null>("");
     const [isSubmitting, setIsSubemitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const { login } = useAuth()
     const navigate = useNavigate()
@@ -64,12 +65,27 @@ export default function LoginPage() {
                         Password
                     </label>
                     <input 
-                        type="password"
+                        type={showPassword? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         className="w-full border border-gray-300 rounded px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+
+                    <div>
+                        <input 
+                            type="checkbox"
+                            checked={showPassword}
+                            onChange={(e) => setShowPassword(e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        />
+
+                        <label
+                        className="text-sm text-gray-600 cursor-pointer select-none"
+                        >
+                            {showPassword ? "Hide password" : "Show password"}
+                        </label>
+                    </div>
 
                     <button
                         type="submit"
@@ -78,6 +94,14 @@ export default function LoginPage() {
                     >
                         {isSubmitting ? 'Logging in...' : 'Log in'}
                     </button>
+
+                    <p className="text-sm text-gray-500 mt-4 text-center">
+                        Don't have an account?{' '}
+                        <Link to="/register" className="text-blue-600 hover:underline">
+                            Sign up
+                        </Link>
+                    </p>
+
                 </form>
             </div>
         )

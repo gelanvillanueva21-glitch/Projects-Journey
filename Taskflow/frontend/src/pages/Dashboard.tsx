@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
-import { getTask, createTask, updateTask, deleteTask, getTasks } from "../api/task";
+import { createTask, updateTask, deleteTask, getTasks } from "../api/task";
 import type { Task } from "../types";
 import { ApiError } from "../api/client";
 
@@ -57,7 +57,9 @@ export default function Dashboard() {
         <div className="min-h-screen bg-gray-100 px-4 py-8">
             <div className="max-w-lg mx-auto">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">{user?.email}'s Taks</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        {user?.full_name? user.full_name.split(" ")[0] : user?.email}'s Tasks
+                    </h1>
                     <button
                         onClick={logout}
                         className="text-sm text-red-500 hover:underline"
