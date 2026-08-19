@@ -128,7 +128,16 @@ export default function Dashboard() {
                 </form>
 
                 {isLoading ? (
-                    <p className="text-gray-500">Loading tasks...</p>
+                    <ul className="space-y-2">
+                        {[1, 2, 3].map((i) => (
+                            <li 
+                                key={i}
+                                className="bg-white rounded shadow-sm px-4 py-3 animate-pulse"
+                                >
+                                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                            </li>
+                        ))}
+                    </ul>
                 ) : tasks.length === 0 ? (
                     <p className="text-gray-500">No task yet - add one above.</p>
                 ) : (

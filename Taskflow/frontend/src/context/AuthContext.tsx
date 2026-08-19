@@ -28,6 +28,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .finally(() => setIsLoading(false))
     }, []);
 
+    useEffect(() => {
+        function handleUnauthorized() {
+            setUser(null);
+        }
+
+        window.addEventListener('auth:unauthorized', handleUnauthorized);
+        return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
+    }, []);
+
     async function login(data: LoginPayload) {
         await apiLogin(data);
         const currentUser = await getCurrentUser();
